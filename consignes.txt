@@ -1,0 +1,5 @@
+Votre projet devra comporter les éléments suivants:
+    Un README.md qui expliquera comment lancer et initialiser votre projet localement
+    Une API avec un seul endpoint (GET) qui retournera toutes les commandes ou candidatures qui ont été réalisées dans la journée sous format CSV
+    Ajoute un bouton dans Django-Admin pour télécharger le CSV disponible par API
+    Ajoute un bouton dans Django-Admin pour importer des commandes ou candidatures depuis un fichier CSV

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Nouvelle candidature</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+            }
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+            .header {
+                background-color: #007bff;
+                color: white;
+                padding: 20px;
+                text-align: center;
+            }
+            .content {
+                padding: 20px;
+                background-color: #f8f9fa;
+            }
+            .footer {
+                text-align: center;
+                padding: 20px;
+                color: #666;
+                font-size: 12px;
+            }
+            .button {
+                display: inline-block;
+                padding: 10px 20px;
+                background-color: #007bff;
+                color: white;
+                text-decoration: none;
+                border-radius: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>Nouvelle candidature reçue</h1>
+            </div>
+
+            <div class="content">
+                <p>Bonjour {{ employer_name }},</p>
+
+                <p>
+                    Une nouvelle candidature a été déposée pour le poste <strong>{{ job_title }}</strong> dans votre
+                    entreprise <strong>{{ company_name }}</strong>.
+                </p>
+
+                <h3>Détails de la candidature :</h3>
+                <ul>
+                    <li><strong>Candidat :</strong> {{ candidate_name }}</li>
+                    <li><strong>Date de candidature :</strong> {{ application_date }}</li>
+                    <li><strong>Poste :</strong> {{ job_title }}</li>
+                    <li><strong>Entreprise :</strong> {{ company_name }}</li>
+                </ul>
+
+                <p style="text-align: center; margin: 30px 0">
+                    <a href="{{ application_url }}" class="button">Voir la candidature</a>
+                </p>
+
+                <p>
+                    Connectez-vous à votre espace d'administration pour examiner cette candidature et prendre une
+                    décision.
+                </p>
+            </div>
+
+            <div class="footer">
+                <p>Cet email a été envoyé automatiquement par la plateforme de candidature.</p>
+                <p>Si vous ne souhaitez plus recevoir ces notifications, contactez l'administrateur.</p>
+            </div>
+        </div>
+    </body>
+</html>

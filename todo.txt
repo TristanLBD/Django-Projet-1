@@ -1,0 +1,25 @@
+Plateforme de dépôt de candidature
+    Développer une plateforme sur laquelle des utilisateurs pourront postuler à des annonces pour des emplois.
+    Les employeurs seront des ‘super_user’ ils pourront créer des annonce via des formulaires uniquement accessible aux super_users et les utilisateurs seront les candidats, ils devront pouvoir :
+        Se connecter
+        Accéder à leur profil (avec photo) et le modifier
+        Avoir accès aux postes non pourvu
+        Déposer une candidature
+        Les employeurs seront des ‘super_user’ ils pourront créer des annonce via des formulaires
+        Créer une entreprise (afin de pouvoir créer des annonces pour cette dernière) - Plusieurs photos doivent pouvoir être uploadées pour présenter la société aux candidats
+
+Votre plateforme devra à minima avoir les vues suivantes pour les candidats:
+    Page de connexion
+    Dashboard avec candidatures déposées
+    Page avec l’ensemble des offres d’emplois non pourvu
+    Page du profil (avec photo) candidat de l’utilisateur
+    Page contenant le détail d’une annonce, d’où ils pourront postuler
+
+ Votre plateforme devra à minima avoir les vues suivantes pour les super_users
+    Dashboard (Manager et QuerySet) avec candidats ayant postulés sur leurs annonces
+    Page contenant le détail d’une annonce, d’où ils pourront valider ou invalider les candidatures
+    Page du profil (avec photo)
+    Notification lorsqu’un candidat postule à une de mes annonces (Signals)
+
+Mais encore … Créer un Git et y mettre tout votre projet (bien entendu, je dois pouvoir voir vos commits et pas juste un upload en fin de projet). Aussi, développer des classes au lieu de simples méthodes.
+Pensez également à commenter votre code, pour vous, vos collègues et moi.

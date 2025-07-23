@@ -1,0 +1,20 @@
+MISE À JOUR DE VOTRE CANDIDATURE
+
+Bonjour {{ candidate_name }},
+
+Le statut de votre candidature pour le poste "{{ job_title }}" chez "{{ company_name }}" a été mis à jour.
+
+DÉTAILS DE LA MISE À JOUR :
+- Ancien statut : {{ old_status }}
+- Nouveau statut : {{ new_status }}
+- Date de mise à jour : {{ status_change_date }}
+
+STATUT ACTUEL : {{ new_status }}
+
+Nous vous tiendrons informé des prochaines étapes du processus de recrutement.
+
+Si vous avez des questions, n'hésitez pas à nous contacter.
+
+---
+Cet email a été envoyé automatiquement par la plateforme de candidature.
+Merci de votre intérêt pour notre entreprise.

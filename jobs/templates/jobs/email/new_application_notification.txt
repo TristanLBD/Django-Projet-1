@@ -1,0 +1,20 @@
+NOUVELLE CANDIDATURE REÇUE
+
+Bonjour {{ employer_name }},
+
+Une nouvelle candidature a été déposée pour le poste "{{ job_title }}" dans votre entreprise "{{ company_name }}".
+
+DÉTAILS DE LA CANDIDATURE :
+- Candidat : {{ candidate_name }}
+- Date de candidature : {{ application_date }}
+- Poste : {{ job_title }}
+- Entreprise : {{ company_name }}
+
+Pour examiner cette candidature, connectez-vous à votre espace d'administration :
+{{ application_url }}
+
+Connectez-vous à votre espace d'administration pour examiner cette candidature et prendre une décision.
+
+---
+Cet email a été envoyé automatiquement par la plateforme de candidature.
+Si vous ne souhaitez plus recevoir ces notifications, contactez l'administrateur.

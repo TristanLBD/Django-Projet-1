@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Mise à jour de votre candidature</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+            }
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+            .header {
+                background-color: #28a745;
+                color: white;
+                padding: 20px;
+                text-align: center;
+            }
+            .content {
+                padding: 20px;
+                background-color: #f8f9fa;
+            }
+            .footer {
+                text-align: center;
+                padding: 20px;
+                color: #666;
+                font-size: 12px;
+            }
+            .status {
+                padding: 10px;
+                border-radius: 5px;
+                margin: 10px 0;
+            }
+            .status.pending {
+                background-color: #fff3cd;
+                border: 1px solid #ffeaa7;
+            }
+            .status.reviewed {
+                background-color: #d1ecf1;
+                border: 1px solid #bee5eb;
+            }
+            .status.accepted {
+                background-color: #d4edda;
+                border: 1px solid #c3e6cb;
+            }
+            .status.rejected {
+                background-color: #f8d7da;
+                border: 1px solid #f5c6cb;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>Mise à jour de votre candidature</h1>
+            </div>
+
+            <div class="content">
+                <p>Bonjour {{ candidate_name }},</p>
+
+                <p>
+                    Le statut de votre candidature pour le poste <strong>{{ job_title }}</strong> chez
+                    <strong>{{ company_name }}</strong> a été mis à jour.
+                </p>
+
+                <h3>Détails de la mise à jour :</h3>
+                <ul>
+                    <li><strong>Ancien statut :</strong> {{ old_status }}</li>
+                    <li><strong>Nouveau statut :</strong> {{ new_status }}</li>
+                    <li><strong>Date de mise à jour :</strong> {{ status_change_date }}</li>
+                </ul>
+
+                <div class="status {{ new_status|lower }}">
+                    <strong>Statut actuel : {{ new_status }}</strong>
+                </div>
+
+                <p>Nous vous tiendrons informé des prochaines étapes du processus de recrutement.</p>
+
+                <p>Si vous avez des questions, n'hésitez pas à nous contacter.</p>
+            </div>
+
+            <div class="footer">
+                <p>Cet email a été envoyé automatiquement par la plateforme de candidature.</p>
+                <p>Merci de votre intérêt pour notre entreprise.</p>
+            </div>
+        </div>
+    </body>
+</html>
