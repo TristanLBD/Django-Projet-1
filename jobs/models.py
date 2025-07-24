@@ -30,6 +30,7 @@ class Job(models.Model):
     )
     description = models.TextField(verbose_name="Description du poste")
     requirements = models.TextField(verbose_name="Prérequis")
+    benefits = models.TextField(blank=True, verbose_name="Avantages et bénéfices")
     contract_type = models.CharField(
         max_length=20,
         choices=CONTRACT_TYPES,

@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}Mes Candidatures - Plateforme d'emploi{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-file-alt"></i> Mes Candidatures
+            </h1>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if applications %}
+                <div class="row">
+                    {% for application in applications %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0">{{ application.job.title }}</h6>
+                                    {% if application.status == 'PENDING' %}
+                                        <span class="badge bg-warning">En attente</span>
+                                    {% elif application.status == 'REVIEWED' %}
+                                        <span class="badge bg-info">Examinée</span>
+                                    {% elif application.status == 'ACCEPTED' %}
+                                        <span class="badge bg-success">Acceptée</span>
+                                    {% elif application.status == 'REJECTED' %}
+                                        <span class="badge bg-danger">Refusée</span>
+                                    {% elif application.status == 'WITHDRAWN' %}
+                                        <span class="badge bg-secondary">Retirée</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">{{ application.job.company.name }}</h6>
+
+                                <p class="card-text">
+                                    <i class="bi bi-geo-alt"></i> {{ application.job.location }}
+                                </p>
+
+                                <p class="card-text">
+                                    <i class="bi bi-calendar"></i> Candidature envoyée le {{ application.applied_at|date:"d/m/Y" }}
+                                </p>
+
+                                {% if application.reviewed_at %}
+                                <p class="card-text">
+                                    <i class="bi bi-clock"></i> Examinée le {{ application.reviewed_at|date:"d/m/Y" }}
+                                </p>
+                                {% endif %}
+
+                                {% if application.notes %}
+                                <div class="alert alert-info">
+                                    <small><strong>Notes du recruteur :</strong></small><br>
+                                    <small>{{ application.notes|truncatewords:20 }}</small>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{% url 'jobs:job_detail' application.job.pk %}" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-eye"></i> Voir l'offre
+                                    </a>
+                                    <a href="{% url 'companies:company_detail' application.job.company.pk %}" class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-building"></i> Entreprise
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Statistiques -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Statistiques de vos candidatures</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-md-2">
+                                        <div class="border rounded p-3">
+                                            <h4 class="text-primary">{{ applications.count }}</h4>
+                                            <small class="text-muted">Total</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="border rounded p-3">
+                                            <h4 class="text-warning">{{ applications|length }}</h4>
+                                            <small class="text-muted">En attente</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="border rounded p-3">
+                                            <h4 class="text-info">0</h4>
+                                            <small class="text-muted">Examinées</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="border rounded p-3">
+                                            <h4 class="text-success">0</h4>
+                                            <small class="text-muted">Acceptées</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="border rounded p-3">
+                                            <h4 class="text-danger">0</h4>
+                                            <small class="text-muted">Refusées</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="border rounded p-3">
+                                            <h4 class="text-secondary">0</h4>
+                                            <small class="text-muted">Retirées</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center">
+                    <div class="alert alert-info">
+                                                    <i class="fas fa-info-circle display-4"></i>
+                        <h4 class="mt-3">Aucune candidature pour le moment</h4>
+                        <p class="mb-3">Vous n'avez pas encore postulé à des offres d'emploi.</p>
+                        <a href="{% url 'jobs:job_list' %}" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Voir les offres disponibles
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Actions -->
+            <div class="text-center mt-4">
+                <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Retour au dashboard
+                </a>
+                <a href="{% url 'jobs:job_list' %}" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Voir les offres
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

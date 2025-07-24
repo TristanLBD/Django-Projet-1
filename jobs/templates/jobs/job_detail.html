@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ job.title }} - {{ job.company.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- En-tête de l'offre -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h1 class="card-title">{{ job.title }}</h1>
+                            <h4 class="text-muted">{{ job.company.name }}</h4>
+
+                            <div class="mb-3">
+                                <span class="badge bg-primary me-2">{{ job.get_contract_type_display }}</span>
+                                <span class="badge bg-secondary me-2">{{ job.get_experience_level_display }}</span>
+                                {% if job.is_remote %}
+                                <span class="badge bg-success me-2">Télétravail possible</span>
+                                {% endif %}
+                                {% if job.is_filled %}
+                                <span class="badge bg-danger">Poste pourvu</span>
+                                {% endif %}
+                            </div>
+
+                            <p class="card-text">
+                                <i class="bi bi-geo-alt"></i> <strong>{{ job.location }}</strong>
+                            </p>
+
+                            {% if job.salary_min or job.salary_max %}
+                            <p class="card-text">
+                                <i class="bi bi-currency-euro"></i> <strong>
+                                {% if job.salary_min and job.salary_max %}
+                                    {{ job.salary_min }} - {{ job.salary_max }} €
+                                {% elif job.salary_min %}
+                                    À partir de {{ job.salary_min }} €
+                                {% elif job.salary_max %}
+                                    Jusqu'à {{ job.salary_max }} €
+                                {% endif %}
+                                </strong>
+                            </p>
+                            {% endif %}
+
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar"></i> Publiée le {{ job.created_at|date:"d/m/Y" }}
+                                    {% if job.updated_at != job.created_at %}
+                                    • Modifiée le {{ job.updated_at|date:"d/m/Y" }}
+                                    {% endif %}
+                                </small>
+                            </p>
+                        </div>
+
+                        <div class="col-md-4 text-end">
+                            {% if not job.is_filled %}
+                                {% if has_applied %}
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-check-circle"></i> Vous avez déjà postulé à cette offre
+                                    </div>
+                                {% else %}
+                                    <a href="{% url 'jobs:job_apply' job.pk %}" class="btn btn-success btn-lg">
+                                        <i class="bi bi-send"></i> Postuler maintenant
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                <div class="alert alert-warning">
+                                    <i class="bi bi-exclamation-triangle"></i> Ce poste est pourvu
+                                </div>
+                            {% endif %}
+
+                            <div class="mt-3">
+                                <a href="{% url 'companies:company_detail' job.company.pk %}" class="btn btn-outline-primary">
+                                    <i class="bi bi-building"></i> Voir l'entreprise
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description et prérequis -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Description du poste</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{ job.description|linebreaks }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Prérequis</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{ job.requirements|linebreaks }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informations sur l'entreprise -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">À propos de {{ job.company.name }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <p class="card-text">{{ job.company.description|truncatewords:50 }}</p>
+                            <p class="card-text">
+                                <i class="bi bi-geo-alt"></i> {{ job.company.address }}
+                            </p>
+                            <p class="card-text">
+                                <i class="bi bi-telephone"></i> {{ job.company.phone }}
+                            </p>
+                            <p class="card-text">
+                                <i class="bi bi-envelope"></i> {{ job.company.email }}
+                            </p>
+                            {% if job.company.website %}
+                            <p class="card-text">
+                                <i class="bi bi-globe"></i>
+                                <a href="{{ job.company.website }}" target="_blank">{{ job.company.website }}</a>
+                            </p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <a href="{% url 'companies:company_detail' job.company.pk %}" class="btn btn-outline-primary">
+                                <i class="bi bi-building"></i> Voir plus d'informations
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="text-center">
+                <a href="{% url 'jobs:job_list' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Retour aux offres
+                </a>
+                {% if not job.is_filled and not has_applied %}
+                <a href="{% url 'jobs:job_apply' job.pk %}" class="btn btn-success">
+                    <i class="bi bi-send"></i> Postuler maintenant
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

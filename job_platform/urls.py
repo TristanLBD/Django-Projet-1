@@ -22,13 +22,15 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('dashboard/', views.user_dashboard, name='user_dashboard'),
+    path('employer/dashboard/', views.employer_dashboard, name='employer_dashboard'),
+    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('admin/initdb/', views.init_db, name='init_db'),
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
-    # URLs pour les applications (à créer plus tard)
-    # path('accounts/', include('accounts.urls')),
-    # path('companies/', include('companies.urls')),
-    # path('jobs/', include('jobs.urls')),
+    path('accounts/', include('accounts.urls')),
+    path('companies/', include('companies.urls')),
+    path('jobs/', include('jobs.urls')),
 ]
 
 # Configuration pour servir les fichiers média en développement

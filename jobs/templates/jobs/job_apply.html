@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Postuler - {{ job.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-paper-plane"></i> Postuler à "{{ job.title }}"
+                    </h4>
+                    <p class="text-muted mb-0">{{ job.company.name }}</p>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Informations sur l'offre -->
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-info-circle"></i> Informations sur l'offre</h6>
+                        <p class="mb-1"><strong>Poste :</strong> {{ job.title }}</p>
+                        <p class="mb-1"><strong>Entreprise :</strong> {{ job.company.name }}</p>
+                        <p class="mb-1"><strong>Localisation :</strong> {{ job.location }}</p>
+                        <p class="mb-0"><strong>Type de contrat :</strong> {{ job.get_contract_type_display }}</p>
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="{{ form.cover_letter.id_for_label }}" class="form-label">
+                                <strong>Lettre de motivation *</strong>
+                            </label>
+                            {{ form.cover_letter }}
+                            {% if form.cover_letter.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.cover_letter.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                Rédigez une lettre de motivation personnalisée pour ce poste.
+                                Expliquez pourquoi vous êtes intéressé par cette offre et pourquoi vous seriez un bon candidat.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.resume.id_for_label }}" class="form-label">
+                                <strong>{{ form.resume.label }} *</strong>
+                            </label>
+                            {{ form.resume }}
+                            {% if form.resume.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.resume.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">{{ form.resume.help_text }}</div>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <h6><i class="fas fa-exclamation-triangle"></i> Important</h6>
+                            <ul class="mb-0">
+                                <li>Vous ne pourrez postuler qu'une seule fois à cette offre</li>
+                                <li>Assurez-vous que votre CV est à jour</li>
+                                <li>Votre lettre de motivation sera lue par les recruteurs</li>
+                                <li>Vous recevrez une notification par email une fois votre candidature envoyée</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'jobs:job_detail' job.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-paper-plane"></i> Envoyer ma candidature
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

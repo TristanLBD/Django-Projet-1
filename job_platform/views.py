@@ -1,25 +1,125 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.http import HttpResponse
 from django.contrib.auth.models import User
-from django.db import connection
-from companies.models import Company, CompanyPhoto
-from jobs.models import Job, Application
-from accounts.models import UserProfile
 from django.utils import timezone
-from datetime import timedelta
-import random
+from jobs.models import Job, Application
+from companies.models import Company, CompanyPhoto
+from accounts.models import UserProfile
+from companies.utils import is_employer, is_admin, get_employer_stats, get_user_companies
 
 
 def home(request):
-    return HttpResponse("""
-    <h1>Plateforme de Dépôt de Candidature</h1>
-    <p>Bienvenue sur la plateforme de gestion des candidatures d'emploi.</p>
-    <ul>
-        <li><a href="/admin/">Administration</a></li>
-        <li><a href="/api/export/applications/today/">API Export CSV</a></li>
-        <li><a href="/admin/initdb/">Initialiser la base de données</a></li>
-    </ul>
-    """)
+    """Vue pour la page d'accueil"""
+    if request.user.is_authenticated:
+        # Rediriger selon le type d'utilisateur
+        if is_admin(request.user):
+            return redirect('admin_dashboard')
+        elif is_employer(request.user):
+            return redirect('employer_dashboard')
+        else:
+            return redirect('user_dashboard')
+
+    # Afficher quelques offres d'emploi récentes pour les visiteurs
+    recent_jobs = Job.objects.filter(is_active=True, is_filled=False).select_related('company').order_by('-created_at')[:6]
+
+    return render(request, 'home.html', {
+        'recent_jobs': recent_jobs
+    })
+
+
+def user_dashboard(request):
+    """Vue pour le dashboard candidat"""
+    if not request.user.is_authenticated:
+        return redirect('accounts:login')
+
+    # Rediriger les employeurs et admins vers leurs dashboards respectifs
+    if is_admin(request.user):
+        return redirect('admin_dashboard')
+    elif is_employer(request.user):
+        return redirect('employer_dashboard')
+
+    # Obtenir les candidatures de l'utilisateur
+    user_applications = Application.objects.filter(candidate=request.user).select_related('job', 'job__company').order_by('-applied_at')[:5]
+
+    # Obtenir les offres d'emploi récentes
+    recent_jobs = Job.objects.filter(is_active=True, is_filled=False).select_related('company').order_by('-created_at')[:6]
+
+    return render(request, 'user_dashboard.html', {
+        'user': request.user,
+        'user_applications': user_applications,
+        'recent_jobs': recent_jobs
+    })
+
+
+def employer_dashboard(request):
+    """Vue pour le dashboard employeur (filtré par entreprise)"""
+    if not request.user.is_authenticated:
+        return redirect('accounts:login')
+
+    # Rediriger les admins vers le dashboard admin
+    if is_admin(request.user):
+        return redirect('admin_dashboard')
+
+    # Vérifier si l'utilisateur est employeur
+    if not is_employer(request.user):
+        messages.error(request, 'Accès refusé. Vous devez être employeur.')
+        return redirect('user_dashboard')
+
+    # Obtenir les statistiques filtrées par entreprise
+    stats = get_employer_stats(request.user)
+
+    # Obtenir les entreprises gérées par l'utilisateur
+    user_companies = get_user_companies(request.user)
+
+    return render(request, 'employer_dashboard.html', {
+        'user': request.user,
+        'user_companies': user_companies,
+        'is_employer': True,
+        **stats
+    })
+
+
+def admin_dashboard(request):
+    """Vue pour le dashboard administrateur (toutes les données)"""
+    if not request.user.is_authenticated:
+        return redirect('accounts:login')
+
+    # Vérifier si l'utilisateur est admin
+    if not is_admin(request.user):
+        messages.error(request, 'Accès refusé. Vous devez être administrateur.')
+        if is_employer(request.user):
+            return redirect('employer_dashboard')
+        else:
+            return redirect('user_dashboard')
+
+    # Statistiques globales
+    total_jobs = Job.objects.count()
+    total_applications = Application.objects.count()
+    total_companies = Company.objects.count()
+    total_users = User.objects.filter(is_superuser=False).count()
+
+    # Candidatures récentes
+    recent_applications = Application.objects.select_related('job', 'job__company', 'candidate').order_by('-applied_at')[:10]
+
+    # Offres d'emploi récentes
+    recent_jobs = Job.objects.select_related('company').order_by('-created_at')[:10]
+
+    # Entreprises récentes
+    recent_companies = Company.objects.order_by('-created_at')[:5]
+
+    return render(request, 'admin_dashboard.html', {
+        'user': request.user,
+        'total_jobs': total_jobs,
+        'total_applications': total_applications,
+        'total_companies': total_companies,
+        'total_users': total_users,
+        'recent_applications': recent_applications,
+        'recent_jobs': recent_jobs,
+        'recent_companies': recent_companies,
+        'is_admin': True
+    })
 
 
 def init_db(request):
@@ -50,6 +150,62 @@ def init_db(request):
             test_user.set_password('testpass123')
             test_user.save()
 
+        # Créer des employeurs pour chaque entreprise
+        employers_data = [
+            {
+                'username': 'techcorp_employer',
+                'email': 'employer@techcorp.fr',
+                'first_name': 'Jean',
+                'last_name': 'TechCorp',
+                'password': 'techcorp123'
+            },
+            {
+                'username': 'digital_employer',
+                'email': 'employer@digitalmarketingpro.fr',
+                'first_name': 'Marie',
+                'last_name': 'Digital',
+                'password': 'digital123'
+            },
+            {
+                'username': 'green_employer',
+                'email': 'employer@greenenergyplus.fr',
+                'first_name': 'Pierre',
+                'last_name': 'Green',
+                'password': 'green123'
+            },
+            {
+                'username': 'finance_employer',
+                'email': 'employer@financeconsulting.fr',
+                'first_name': 'Sophie',
+                'last_name': 'Finance',
+                'password': 'finance123'
+            },
+            {
+                'username': 'creative_employer',
+                'email': 'employer@creativedesignstudio.fr',
+                'first_name': 'Lucas',
+                'last_name': 'Creative',
+                'password': 'creative123'
+            }
+        ]
+
+        # Créer les employeurs
+        employers = []
+        for data in employers_data:
+            employer, created = User.objects.get_or_create(
+                username=data['username'],
+                defaults={
+                    'email': data['email'],
+                    'first_name': data['first_name'],
+                    'last_name': data['last_name'],
+                    'is_staff': True
+                }
+            )
+            if created:
+                employer.set_password(data['password'])
+                employer.save()
+            employers.append(employer)
+
         # Données des entreprises
         companies_data = [
             {
@@ -58,7 +214,8 @@ def init_db(request):
                 'address': '15 Avenue de l\'Innovation, 75001 Paris',
                 'phone': '01 42 34 56 78',
                 'email': 'contact@techcorp.fr',
-                'website': 'https://techcorp.fr'
+                'website': 'https://techcorp.fr',
+                'employer': employers[0]
             },
             {
                 'name': 'Digital Marketing Pro',
@@ -66,7 +223,8 @@ def init_db(request):
                 'address': '28 Rue du Commerce, 75015 Paris',
                 'phone': '01 45 67 89 12',
                 'email': 'info@digitalmarketingpro.fr',
-                'website': 'https://digitalmarketingpro.fr'
+                'website': 'https://digitalmarketingpro.fr',
+                'employer': employers[1]
             },
             {
                 'name': 'Green Energy Plus',
@@ -74,7 +232,8 @@ def init_db(request):
                 'address': '7 Boulevard de l\'Écologie, 69001 Lyon',
                 'phone': '04 78 12 34 56',
                 'email': 'contact@greenenergyplus.fr',
-                'website': 'https://greenenergyplus.fr'
+                'website': 'https://greenenergyplus.fr',
+                'employer': employers[2]
             },
             {
                 'name': 'Finance & Consulting',
@@ -82,7 +241,8 @@ def init_db(request):
                 'address': '42 Rue de la Finance, 13001 Marseille',
                 'phone': '04 91 23 45 67',
                 'email': 'contact@financeconsulting.fr',
-                'website': 'https://financeconsulting.fr'
+                'website': 'https://financeconsulting.fr',
+                'employer': employers[3]
             },
             {
                 'name': 'Creative Design Studio',
@@ -90,7 +250,8 @@ def init_db(request):
                 'address': '3 Place des Arts, 31000 Toulouse',
                 'phone': '05 61 34 56 78',
                 'email': 'hello@creativedesignstudio.fr',
-                'website': 'https://creativedesignstudio.fr'
+                'website': 'https://creativedesignstudio.fr',
+                'employer': employers[4]
             }
         ]
 
@@ -104,131 +265,73 @@ def init_db(request):
                 phone=data['phone'],
                 email=data['email'],
                 website=data['website'],
-                created_by=request.user
+                created_by=request.user,
+                employer=data['employer']
             )
             companies.append(company)
 
         # Données des offres d'emploi
         jobs_data = [
             # TechCorp Solutions
-            {'title': 'Développeur Full Stack', 'contract': 'CDI', 'level': 'SENIOR', 'location': 'Paris', 'remote': True},
-            {'title': 'Data Scientist', 'contract': 'CDI', 'level': 'EXPERT', 'location': 'Paris', 'remote': True},
-            {'title': 'DevOps Engineer', 'contract': 'CDD', 'level': 'JUNIOR', 'location': 'Paris', 'remote': False},
-            {'title': 'Product Manager', 'contract': 'CDI', 'level': 'SENIOR', 'location': 'Paris', 'remote': True},
-            {'title': 'UX/UI Designer', 'contract': 'STAGE', 'level': 'DEBUTANT', 'location': 'Paris', 'remote': False},
+            {'title': 'Développeur Full Stack', 'contract': 'CDI', 'level': 'SENIOR', 'location': 'Paris', 'remote': True, 'company': companies[0]},
+            {'title': 'Data Scientist', 'contract': 'CDI', 'level': 'EXPERT', 'location': 'Paris', 'remote': True, 'company': companies[0]},
+            {'title': 'DevOps Engineer', 'contract': 'CDD', 'level': 'JUNIOR', 'location': 'Paris', 'remote': False, 'company': companies[0]},
+            {'title': 'Product Manager', 'contract': 'CDI', 'level': 'SENIOR', 'location': 'Paris', 'remote': True, 'company': companies[0]},
 
             # Digital Marketing Pro
-            {'title': 'Chef de Projet Marketing', 'contract': 'CDI', 'level': 'SENIOR', 'location': 'Paris', 'remote': True},
-            {'title': 'Community Manager', 'contract': 'CDD', 'level': 'JUNIOR', 'location': 'Paris', 'remote': True},
-            {'title': 'Analyste SEO', 'contract': 'CDI', 'level': 'JUNIOR', 'location': 'Paris', 'remote': False},
-            {'title': 'Graphiste', 'contract': 'ALTERNANCE', 'level': 'DEBUTANT', 'location': 'Paris', 'remote': False},
-            {'title': 'Responsable Communication', 'contract': 'CDI', 'level': 'SENIOR', 'location': 'Paris', 'remote': True},
+            {'title': 'Marketing Digital Manager', 'contract': 'CDI', 'level': 'SENIOR', 'location': 'Paris', 'remote': True, 'company': companies[1]},
+            {'title': 'SEO Specialist', 'contract': 'CDD', 'level': 'JUNIOR', 'location': 'Paris', 'remote': False, 'company': companies[1]},
+            {'title': 'Social Media Manager', 'contract': 'CDI', 'level': 'JUNIOR', 'location': 'Paris', 'remote': True, 'company': companies[1]},
 
             # Green Energy Plus
-            {'title': 'Ingénieur Énergies Renouvelables', 'contract': 'CDI', 'level': 'SENIOR', 'location': 'Lyon', 'remote': False},
-            {'title': 'Technicien Maintenance', 'contract': 'CDI', 'level': 'JUNIOR', 'location': 'Lyon', 'remote': False},
-            {'title': 'Chargé d\'Affaires', 'contract': 'CDD', 'level': 'JUNIOR', 'location': 'Lyon', 'remote': True},
-            {'title': 'Stagiaire R&D', 'contract': 'STAGE', 'level': 'DEBUTANT', 'location': 'Lyon', 'remote': False},
-            {'title': 'Responsable Projet', 'contract': 'CDI', 'level': 'EXPERT', 'location': 'Lyon', 'remote': True},
+            {'title': 'Ingénieur Énergies Renouvelables', 'contract': 'CDI', 'level': 'SENIOR', 'location': 'Lyon', 'remote': False, 'company': companies[2]},
+            {'title': 'Technicien Maintenance', 'contract': 'CDD', 'level': 'DEBUTANT', 'location': 'Lyon', 'remote': False, 'company': companies[2]},
 
             # Finance & Consulting
-            {'title': 'Consultant Financier', 'contract': 'CDI', 'level': 'SENIOR', 'location': 'Marseille', 'remote': True},
-            {'title': 'Analyste Financier', 'contract': 'CDD', 'level': 'JUNIOR', 'location': 'Marseille', 'remote': False},
-            {'title': 'Chargé de Clientèle', 'contract': 'CDI', 'level': 'JUNIOR', 'location': 'Marseille', 'remote': False},
-            {'title': 'Stagiaire Audit', 'contract': 'STAGE', 'level': 'DEBUTANT', 'location': 'Marseille', 'remote': False},
-            {'title': 'Directeur Financier', 'contract': 'CDI', 'level': 'EXPERT', 'location': 'Marseille', 'remote': True},
+            {'title': 'Consultant Financier', 'contract': 'CDI', 'level': 'EXPERT', 'location': 'Marseille', 'remote': True, 'company': companies[3]},
+            {'title': 'Analyste Financier', 'contract': 'CDI', 'level': 'JUNIOR', 'location': 'Marseille', 'remote': False, 'company': companies[3]},
 
             # Creative Design Studio
-            {'title': 'Designer Graphique', 'contract': 'CDI', 'level': 'SENIOR', 'location': 'Toulouse', 'remote': True},
-            {'title': 'UX Designer', 'contract': 'CDD', 'level': 'JUNIOR', 'location': 'Toulouse', 'remote': True},
-            {'title': 'Motion Designer', 'contract': 'CDI', 'level': 'JUNIOR', 'location': 'Toulouse', 'remote': False},
-            {'title': 'Stagiaire Design', 'contract': 'STAGE', 'level': 'DEBUTANT', 'location': 'Toulouse', 'remote': False},
-            {'title': 'Directeur Artistique', 'contract': 'CDI', 'level': 'EXPERT', 'location': 'Toulouse', 'remote': True}
+            {'title': 'Designer UX/UI', 'contract': 'CDI', 'level': 'SENIOR', 'location': 'Toulouse', 'remote': True, 'company': companies[4]},
+            {'title': 'Graphiste Créatif', 'contract': 'CDD', 'level': 'JUNIOR', 'location': 'Toulouse', 'remote': False, 'company': companies[4]},
         ]
 
         # Créer les offres d'emploi
-        jobs = []
-        for i, job_data in enumerate(jobs_data):
-            company = companies[i // 5]  # 5 jobs par entreprise
-            job = Job.objects.create(
-                title=job_data['title'],
-                company=company,
-                description=f"Description détaillée du poste {job_data['title']} chez {company.name}.",
-                requirements=f"Prérequis pour le poste {job_data['title']} : expérience, compétences, formation.",
-                contract_type=job_data['contract'],
-                experience_level=job_data['level'],
-                location=job_data['location'],
-                is_remote=job_data['remote'],
+        for data in jobs_data:
+            Job.objects.create(
+                title=data['title'],
+                company=data['company'],
+                description=f"Description détaillée pour le poste de {data['title']} chez {data['company'].name}.",
+                requirements=f"Prérequis pour le poste de {data['title']} : expérience requise, compétences techniques, etc.",
+                contract_type=data['contract'],
+                experience_level=data['level'],
+                salary_min=35000 if data['level'] in ['JUNIOR', 'DEBUTANT'] else 45000,
+                salary_max=55000 if data['level'] in ['JUNIOR', 'DEBUTANT'] else 80000,
+                location=data['location'],
+                is_remote=data['remote'],
                 created_by=request.user
             )
-            jobs.append(job)
 
         # Créer quelques candidatures de test
-        candidates_data = [
-            {'username': 'candidat1', 'email': 'candidat1@example.com', 'first_name': 'Jean', 'last_name': 'Dupont'},
-            {'username': 'candidat2', 'email': 'candidat2@example.com', 'first_name': 'Marie', 'last_name': 'Martin'},
-            {'username': 'candidat3', 'email': 'candidat3@example.com', 'first_name': 'Pierre', 'last_name': 'Durand'},
-            {'username': 'candidat4', 'email': 'candidat4@example.com', 'first_name': 'Sophie', 'last_name': 'Leroy'},
-            {'username': 'candidat5', 'email': 'candidat5@example.com', 'first_name': 'Lucas', 'last_name': 'Moreau'},
-        ]
-
-        candidates = []
-        for data in candidates_data:
-            user, created = User.objects.get_or_create(
-                username=data['username'],
-                defaults={
-                    'email': data['email'],
-                    'first_name': data['first_name'],
-                    'last_name': data['last_name']
-                }
+        test_user = User.objects.get(username='testuser')
+        for job in Job.objects.all()[:5]:  # Premières 5 offres
+            Application.objects.create(
+                job=job,
+                candidate=test_user,
+                cover_letter=f"Lettre de motivation pour le poste de {job.title} chez {job.company.name}. Je suis très intéressé par cette opportunité et je pense avoir les compétences nécessaires pour ce poste.",
+                resume=None,  # Pas de CV pour les tests
+                status='PENDING'
             )
-            if created:
-                user.set_password('password123')
-                user.save()
-            candidates.append(user)
 
-        # Créer des candidatures (en s'assurant qu'un candidat ne postule qu'une fois par offre)
-        statuses = ['PENDING', 'REVIEWED', 'ACCEPTED', 'REJECTED']
-        applications_created = 0
-        max_attempts = 100  # Éviter une boucle infinie
-
-        for attempt in range(max_attempts):
-            if applications_created >= 15:  # On veut 15 candidatures
-                break
-
-            job = random.choice(jobs)
-            candidate = random.choice(candidates)
-            status = random.choice(statuses)
-
-            # Vérifier si cette candidature existe déjà
-            if not Application.objects.filter(job=job, candidate=candidate).exists():
-                application = Application.objects.create(
-                    job=job,
-                    candidate=candidate,
-                    cover_letter=f"Lettre de motivation pour le poste {job.title}",
-                    status=status
-                )
-
-                # Si le statut n'est pas en attente, ajouter des dates de review
-                if status != 'PENDING':
-                    application.reviewed_at = timezone.now() - timedelta(days=random.randint(1, 30))
-                    application.reviewed_by = request.user
-                    application.save()
-
-                applications_created += 1
-
-        return HttpResponse(f"""
-        <h1>Base de données initialisée avec succès !</h1>
-        <p>Données créées :</p>
-        <ul>
-            <li>5 entreprises</li>
-            <li>25 offres d'emploi (5 par entreprise)</li>
-            <li>5 candidats</li>
-            <li>{applications_created} candidatures</li>
-        </ul>
-        <p><a href="/admin/">Aller à l'administration</a></p>
-        <p><a href="/">Retour à l'accueil</a></p>
-        """)
+        return HttpResponse("Base de données initialisée avec succès !<br><br>"
+                          "<strong>Comptes employeurs créés :</strong><br>"
+                          "• techcorp_employer / techcorp123<br>"
+                          "• digital_employer / digital123<br>"
+                          "• green_employer / green123<br>"
+                          "• finance_employer / finance123<br>"
+                          "• creative_employer / creative123<br><br>"
+                          "• testuser / testpass123 (candidat)<br>"
+                          "• admin / admin123 (administrateur)")
 
     except Exception as e:
         return HttpResponse(f"Erreur lors de l'initialisation : {str(e)}", status=500)

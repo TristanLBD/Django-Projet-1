@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}Offres d'emploi - Plateforme d'emploi{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-search"></i> Offres d'emploi
+            </h1>
+
+            <!-- Filtres -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Filtres</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="search" class="form-label">Recherche</label>
+                            <input type="text" class="form-control" id="search" name="search"
+                                   value="{{ search }}" placeholder="Titre, entreprise, description...">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="location" class="form-label">Localisation</label>
+                            <input type="text" class="form-control" id="location" name="location"
+                                   value="{{ location }}" placeholder="Ville...">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="contract_type" class="form-label">Type de contrat</label>
+                            <select class="form-select" id="contract_type" name="contract_type">
+                                <option value="">Tous</option>
+                                {% for value, label in contract_types %}
+                                <option value="{{ value }}" {% if contract_type == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="experience_level" class="form-label">Expérience</label>
+                            <select class="form-select" id="experience_level" name="experience_level">
+                                <option value="">Tous</option>
+                                {% for value, label in experience_levels %}
+                                <option value="{{ value }}" {% if experience_level == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search"></i> Filtrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Résultats -->
+            <div class="row">
+                {% if jobs %}
+                    {% for job in jobs %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ job.title }}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">{{ job.company.name }}</h6>
+
+                                <div class="mb-3">
+                                    <span class="badge bg-primary">{{ job.get_contract_type_display }}</span>
+                                    <span class="badge bg-secondary">{{ job.get_experience_level_display }}</span>
+                                    {% if job.is_remote %}
+                                    <span class="badge bg-success">Télétravail</span>
+                                    {% endif %}
+                                </div>
+
+                                <p class="card-text">
+                                    <i class="bi bi-geo-alt"></i> {{ job.location }}
+                                </p>
+
+                                {% if job.salary_min or job.salary_max %}
+                                <p class="card-text">
+                                    <i class="bi bi-currency-euro"></i>
+                                    {% if job.salary_min and job.salary_max %}
+                                        {{ job.salary_min }} - {{ job.salary_max }} €
+                                    {% elif job.salary_min %}
+                                        À partir de {{ job.salary_min }} €
+                                    {% elif job.salary_max %}
+                                        Jusqu'à {{ job.salary_max }} €
+                                    {% endif %}
+                                </p>
+                                {% endif %}
+
+                                <p class="card-text">
+                                    {{ job.description|truncatewords:20 }}
+                                </p>
+                            </div>
+                            <div class="card-footer">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar"></i> {{ job.created_at|date:"d/m/Y" }}
+                                    </small>
+                                    <a href="{% url 'jobs:job_detail' job.pk %}" class="btn btn-primary btn-sm">
+                                        Voir détails
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle display-4"></i>
+                            <h4 class="mt-3">Aucune offre d'emploi trouvée</h4>
+                            <p class="mb-0">Essayez de modifier vos critères de recherche.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Pagination (à implémenter plus tard) -->
+            {% if jobs.has_other_pages %}
+            <nav aria-label="Navigation des offres d'emploi">
+                <ul class="pagination justify-content-center">
+                    {% if jobs.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ jobs.previous_page_number }}">Précédent</a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in jobs.paginator.page_range %}
+                    <li class="page-item {% if jobs.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+
+                    {% if jobs.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ jobs.next_page_number }}">Suivant</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -23,3 +23,14 @@ Votre plateforme devra à minima avoir les vues suivantes pour les candidats:
 
 Mais encore … Créer un Git et y mettre tout votre projet (bien entendu, je dois pouvoir voir vos commits et pas juste un upload en fin de projet). Aussi, développer des classes au lieu de simples méthodes.
 Pensez également à commenter votre code, pour vous, vos collègues et moi.
+
+
+Comptes employeurs créés :
+• techcorp_employer / techcorp123
+• digital_employer / digital123
+• green_employer / green123
+• finance_employer / finance123
+• creative_employer / creative123
+
+• testuser / testpass123 (candidat)
+• admin / admin123 (administrateur)

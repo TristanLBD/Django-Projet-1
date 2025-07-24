@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block title %}Détail de la candidature - Plateforme d'emploi{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-file-alt"></i> Détail de la candidature
+            </h1>
+
+            <!-- Informations de la candidature -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle"></i> Informations de la candidature
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Offre d'emploi :</strong> {{ application.job.title }}</p>
+                            <p><strong>Entreprise :</strong> {{ application.job.company.name }}</p>
+                            <p><strong>Date de candidature :</strong> {{ application.applied_at|date:"d/m/Y H:i" }}</p>
+                            <p><strong>Statut :</strong>
+                                {% if application.status == 'PENDING' %}
+                                    <span class="badge bg-warning">En attente</span>
+                                {% elif application.status == 'REVIEWED' %}
+                                    <span class="badge bg-info">En cours d'examen</span>
+                                {% elif application.status == 'ACCEPTED' %}
+                                    <span class="badge bg-success">Acceptée</span>
+                                {% elif application.status == 'REJECTED' %}
+                                    <span class="badge bg-danger">Refusée</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            {% if application.reviewed_by %}
+                            <p><strong>Examinée par :</strong> {{ application.reviewed_by.get_full_name }}</p>
+                            <p><strong>Date d'examen :</strong> {{ application.reviewed_at|date:"d/m/Y H:i" }}</p>
+                            {% endif %}
+                            {% if application.notes %}
+                            <p><strong>Notes :</strong> {{ application.notes }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informations du candidat -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user"></i> Informations du candidat
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            {% if application.candidate.profile.photo %}
+                                <img src="{{ application.candidate.profile.photo.url }}"
+                                     alt="{{ application.candidate.get_full_name }}"
+                                     class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                                     style="width: 150px; height: 150px;">
+                                    <i class="fas fa-user fa-3x text-muted"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-9">
+                            <h4>{{ application.candidate.get_full_name }}</h4>
+                            <p><strong>Email :</strong> {{ application.candidate.email }}</p>
+
+                            {% if application.candidate.profile.phone %}
+                            <p><strong>Téléphone :</strong> {{ application.candidate.profile.phone }}</p>
+                            {% endif %}
+
+                            {% if application.candidate.profile.address %}
+                            <p><strong>Adresse :</strong> {{ application.candidate.profile.address }}</p>
+                            {% endif %}
+
+                            {% if application.candidate.profile.birth_date %}
+                            <p><strong>Date de naissance :</strong> {{ application.candidate.profile.birth_date|date:"d/m/Y" }}</p>
+                            {% endif %}
+
+                            {% if application.candidate.profile.bio %}
+                            <p><strong>Biographie :</strong> {{ application.candidate.profile.bio }}</p>
+                            {% endif %}
+
+                            <!-- Liens sociaux -->
+                            <div class="mt-3">
+                                {% if application.candidate.profile.linkedin_url %}
+                                <a href="{{ application.candidate.profile.linkedin_url }}" target="_blank" class="btn btn-outline-primary me-2">
+                                    <i class="fab fa-linkedin"></i> LinkedIn
+                                </a>
+                                {% endif %}
+
+                                {% if application.candidate.profile.github_url %}
+                                <a href="{{ application.candidate.profile.github_url }}" target="_blank" class="btn btn-outline-dark me-2">
+                                    <i class="fab fa-github"></i> GitHub
+                                </a>
+                                {% endif %}
+
+                                {% if application.candidate.profile.website_url %}
+                                <a href="{{ application.candidate.profile.website_url }}" target="_blank" class="btn btn-outline-success">
+                                    <i class="fas fa-globe"></i> Site web
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CV et lettre de motivation -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-file-pdf"></i> CV
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if application.resume %}
+                                <p><strong>Fichier :</strong> {{ application.resume.name|slice:"19:" }}</p>
+                                <a href="{{ application.resume.url }}" class="btn btn-primary" target="_blank">
+                                    <i class="fas fa-download"></i> Télécharger le CV
+                                </a>
+                            {% else %}
+                                <p class="text-muted">Aucun CV fourni</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-envelope"></i> Lettre de motivation
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if application.cover_letter %}
+                                <div class="border rounded p-3 bg-light">
+                                    {{ application.cover_letter|linebreaks }}
+                                </div>
+                            {% else %}
+                                <p class="text-muted">Aucune lettre de motivation fournie</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Actions -->
+            <div class="text-center mt-4">
+                <a href="{% url 'jobs:application_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Retour à la liste
+                </a>
+                <a href="{% url 'jobs:application_review' application.pk %}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Examiner la candidature
+                </a>
+                <a href="{% url 'jobs:job_detail' application.job.pk %}" class="btn btn-info">
+                    <i class="fas fa-briefcase"></i> Voir l'offre
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,299 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestion des offres d'emploi - Plateforme d'emploi{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-briefcase"></i> Gestion des offres d'emploi
+            </h1>
+
+            <!-- Statistiques -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="mb-0">{{ total_jobs }}</h4>
+                                    <small>Total offres</small>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-briefcase fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="mb-0">{{ active_jobs }}</h4>
+                                    <small>Offres actives</small>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-check-circle fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="mb-0">{{ filled_jobs }}</h4>
+                                    <small>Postes pourvus</small>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-user-check fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="mb-0">{{ total_applications }}</h4>
+                                    <small>Candidatures</small>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-file-alt fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions rapides -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt"></i> Actions rapides
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <a href="{% url 'jobs:job_create' %}" class="btn btn-success w-100 mb-2">
+                                <i class="fas fa-plus-circle"></i> Nouvelle offre
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'jobs:application_list' %}" class="btn btn-primary w-100 mb-2">
+                                <i class="fas fa-file-alt"></i> Voir candidatures
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'jobs:job_list' %}" class="btn btn-info w-100 mb-2">
+                                <i class="fas fa-eye"></i> Voir publiquement
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'employer_dashboard' %}" class="btn btn-secondary w-100 mb-2">
+                                <i class="fas fa-arrow-left"></i> Retour dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtres -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-filter"></i> Filtres
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="status" class="form-label">Statut</label>
+                            <select name="status" id="status" class="form-select">
+                                <option value="">Tous les statuts</option>
+                                <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Actives</option>
+                                <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactives</option>
+                                <option value="filled" {% if request.GET.status == 'filled' %}selected{% endif %}>Pourvues</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="company" class="form-label">Entreprise</label>
+                            <select name="company" id="company" class="form-select">
+                                <option value="">Toutes les entreprises</option>
+                                {% for company in companies %}
+                                <option value="{{ company.id }}" {% if request.GET.company == company.id|stringformat:"s" %}selected{% endif %}>{{ company.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="contract" class="form-label">Type de contrat</label>
+                            <select name="contract" id="contract" class="form-select">
+                                <option value="">Tous les contrats</option>
+                                <option value="CDI" {% if request.GET.contract == 'CDI' %}selected{% endif %}>CDI</option>
+                                <option value="CDD" {% if request.GET.contract == 'CDD' %}selected{% endif %}>CDD</option>
+                                <option value="STAGE" {% if request.GET.contract == 'STAGE' %}selected{% endif %}>Stage</option>
+                                <option value="ALTERNANCE" {% if request.GET.contract == 'ALTERNANCE' %}selected{% endif %}>Alternance</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="location" class="form-label">Localisation</label>
+                            <input type="text" name="location" id="location" class="form-control" value="{{ request.GET.location }}" placeholder="Ville...">
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Filtrer
+                            </button>
+                            <a href="{% url 'jobs:job_manage' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Réinitialiser
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Liste des offres -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list"></i> Liste des offres d'emploi
+                        <span class="badge bg-secondary ms-2">{{ jobs|length }}</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if jobs %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Titre</th>
+                                        <th>Entreprise</th>
+                                        <th>Localisation</th>
+                                        <th>Contrat</th>
+                                        <th>Statut</th>
+                                        <th>Candidatures</th>
+                                        <th>Date création</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for job in jobs %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ job.title }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ job.experience_level }}</small>
+                                        </td>
+                                        <td>
+                                            <strong>{{ job.company.name }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ job.company.location|default:"Non spécifié" }}</small>
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-map-marker-alt"></i> {{ job.location }}
+                                            {% if job.is_remote %}
+                                                <span class="badge bg-success ms-1">Télétravail</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">{{ job.get_contract_type_display }}</span>
+                                        </td>
+                                        <td>
+                                            {% if job.is_active and not job.is_filled %}
+                                                <span class="badge bg-success">Active</span>
+                                            {% elif job.is_filled %}
+                                                <span class="badge bg-warning">Pourvue</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Inactive</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary">{{ job.application_set.count }}</span>
+                                        </td>
+                                        <td>
+                                            <small>{{ job.created_at|date:"d/m/Y" }}</small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'jobs:job_detail' job.pk %}" class="btn btn-sm btn-outline-primary" title="Voir">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{% url 'jobs:job_edit' job.pk %}" class="btn btn-sm btn-outline-warning" title="Modifier">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'jobs:application_list' %}?job={{ job.id }}" class="btn btn-sm btn-outline-info" title="Candidatures">
+                                                    <i class="fas fa-file-alt"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" title="Supprimer"
+                                                        onclick="confirmDelete('{{ job.title }}', '{% url 'jobs:job_delete' job.pk %}')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center">
+                            <div class="alert alert-info">
+                                <i class="fas fa-briefcase display-4"></i>
+                                <h4 class="mt-3">Aucune offre trouvée</h4>
+                                <p class="mb-0">Aucune offre d'emploi ne correspond à vos critères de recherche.</p>
+                                <a href="{% url 'jobs:job_create' %}" class="btn btn-primary mt-3">
+                                    <i class="fas fa-plus-circle"></i> Créer une offre
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="fas fa-exclamation-triangle text-danger"></i> Confirmer la suppression
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer l'offre d'emploi :</p>
+                <p><strong id="jobTitle"></strong></p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Attention :</strong> Cette action supprimera également toutes les candidatures associées.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <a href="#" id="deleteConfirmBtn" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Supprimer
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmDelete(jobTitle, deleteUrl) {
+    document.getElementById('jobTitle').textContent = jobTitle;
+    document.getElementById('deleteConfirmBtn').href = deleteUrl;
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
+{% endblock %}

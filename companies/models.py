@@ -16,6 +16,15 @@ class Company(models.Model):
         verbose_name="Créé par",
         related_name='companies_created'
     )
+    employer = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Employeur responsable",
+        related_name='companies_managed',
+        null=True,
+        blank=True,
+        help_text="L'employeur responsable de cette entreprise"
+    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Créé le")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Modifié le")
     is_active = models.BooleanField(default=True, verbose_name="Actif")

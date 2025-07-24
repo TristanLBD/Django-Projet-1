@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}Examiner la candidature - Plateforme d'emploi{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-edit"></i> Examiner la candidature
+            </h1>
+
+            <!-- Informations de la candidature -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle"></i> Informations de la candidature
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Candidat :</strong> {{ application.candidate.get_full_name }}</p>
+                            <p><strong>Offre d'emploi :</strong> {{ application.job.title }}</p>
+                            <p><strong>Entreprise :</strong> {{ application.job.company.name }}</p>
+                            <p><strong>Date de candidature :</strong> {{ application.applied_at|date:"d/m/Y H:i" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Statut actuel :</strong>
+                                {% if application.status == 'PENDING' %}
+                                    <span class="badge bg-warning">En attente</span>
+                                {% elif application.status == 'REVIEWED' %}
+                                    <span class="badge bg-info">En cours d'examen</span>
+                                {% elif application.status == 'ACCEPTED' %}
+                                    <span class="badge bg-success">Acceptée</span>
+                                {% elif application.status == 'REJECTED' %}
+                                    <span class="badge bg-danger">Refusée</span>
+                                {% endif %}
+                            </p>
+                            {% if application.reviewed_by %}
+                            <p><strong>Dernière évaluation par :</strong> {{ application.reviewed_by.get_full_name }}</p>
+                            <p><strong>Date d'évaluation :</strong> {{ application.reviewed_at|date:"d/m/Y H:i" }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulaire d'évaluation -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clipboard-check"></i> Évaluation de la candidature
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="status" class="form-label">
+                                <strong>Nouveau statut *</strong>
+                            </label>
+                            <select name="status" id="status" class="form-select" required>
+                                <option value="">Sélectionnez un statut</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if application.status == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>En attente :</strong> Candidature reçue, en attente d'examen<br>
+                                <strong>En cours d'examen :</strong> Candidature en cours d'évaluation<br>
+                                <strong>Acceptée :</strong> Candidature retenue pour la suite du processus<br>
+                                <strong>Refusée :</strong> Candidature non retenue
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">
+                                <strong>Notes d'évaluation</strong>
+                            </label>
+                            <textarea name="notes" id="notes" class="form-control" rows="6"
+                                      placeholder="Ajoutez vos commentaires sur cette candidature...">{{ application.notes|default:'' }}</textarea>
+                            <div class="form-text">
+                                <i class="fas fa-lightbulb"></i>
+                                Ces notes sont privées et ne seront visibles que par les employeurs.
+                            </div>
+                        </div>
+
+                        <!-- Actions rapides -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <strong>Actions rapides</strong>
+                            </label>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <button type="button" class="btn btn-outline-success btn-sm" onclick="setStatus('ACCEPTED')">
+                                    <i class="fas fa-check"></i> Accepter rapidement
+                                </button>
+                                <button type="button" class="btn btn-outline-danger btn-sm" onclick="setStatus('REJECTED')">
+                                    <i class="fas fa-times"></i> Refuser rapidement
+                                </button>
+                                <button type="button" class="btn btn-outline-info btn-sm" onclick="setStatus('REVIEWED')">
+                                    <i class="fas fa-eye"></i> Marquer comme examinée
+                                </button>
+                                <button type="button" class="btn btn-outline-warning btn-sm" onclick="setStatus('PENDING')">
+                                    <i class="fas fa-clock"></i> Remettre en attente
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Boutons d'action -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'jobs:application_detail' application.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Enregistrer l'évaluation
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Liens rapides -->
+            <div class="text-center mt-4">
+                <a href="{% url 'jobs:application_detail' application.pk %}" class="btn btn-outline-info me-2">
+                    <i class="fas fa-eye"></i> Voir les détails
+                </a>
+                <a href="{% url 'jobs:application_list' %}" class="btn btn-outline-secondary me-2">
+                    <i class="fas fa-list"></i> Liste des candidatures
+                </a>
+                <a href="{% url 'jobs:job_detail' application.job.pk %}" class="btn btn-outline-primary">
+                    <i class="fas fa-briefcase"></i> Voir l'offre
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function setStatus(status) {
+    document.getElementById('status').value = status;
+
+    // Mise à jour visuelle du bouton
+    const buttons = document.querySelectorAll('.btn-outline-success, .btn-outline-danger, .btn-outline-info, .btn-outline-warning');
+    buttons.forEach(btn => {
+        btn.classList.remove('btn-success', 'btn-danger', 'btn-info', 'btn-warning');
+        btn.classList.add('btn-outline-success', 'btn-outline-danger', 'btn-outline-info', 'btn-outline-warning');
+    });
+
+    // Mettre en surbrillance le bouton sélectionné
+    const selectedButton = event.target.closest('button');
+    if (selectedButton) {
+        selectedButton.classList.remove('btn-outline-success', 'btn-outline-danger', 'btn-outline-info', 'btn-outline-warning');
+        if (status === 'ACCEPTED') {
+            selectedButton.classList.add('btn-success');
+        } else if (status === 'REJECTED') {
+            selectedButton.classList.add('btn-danger');
+        } else if (status === 'REVIEWED') {
+            selectedButton.classList.add('btn-info');
+        } else if (status === 'PENDING') {
+            selectedButton.classList.add('btn-warning');
+        }
+    }
+}
+</script>
+{% endblock %}

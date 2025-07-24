@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+
+{% block title %}Modifier mon profil - Plateforme d'emploi{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-edit"></i> Modifier mon profil
+            </h1>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-user-edit"></i> Informations personnelles
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ user_form.phone.id_for_label }}" class="form-label">
+                                                <i class="fas fa-phone"></i> Téléphone
+                                            </label>
+                                            {{ user_form.phone }}
+                                            {% if user_form.phone.errors %}
+                                                <div class="text-danger">
+                                                    {% for error in user_form.phone.errors %}
+                                                        <small>{{ error }}</small>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ user_form.birth_date.id_for_label }}" class="form-label">
+                                                <i class="fas fa-birthday-cake"></i> Date de naissance
+                                            </label>
+                                            {{ user_form.birth_date }}
+                                            {% if user_form.birth_date.errors %}
+                                                <div class="text-danger">
+                                                    {% for error in user_form.birth_date.errors %}
+                                                        <small>{{ error }}</small>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ user_form.gender.id_for_label }}" class="form-label">
+                                                <i class="fas fa-venus-mars"></i> Genre
+                                            </label>
+                                            {{ user_form.gender }}
+                                            {% if user_form.gender.errors %}
+                                                <div class="text-danger">
+                                                    {% for error in user_form.gender.errors %}
+                                                        <small>{{ error }}</small>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ user_form.photo.id_for_label }}" class="form-label">
+                                                <i class="fas fa-camera"></i> Photo de profil
+                                            </label>
+                                            {{ user_form.photo }}
+                                            {% if user_form.photo.errors %}
+                                                <div class="text-danger">
+                                                    {% for error in user_form.photo.errors %}
+                                                        <small>{{ error }}</small>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                            {% if user.profile.photo %}
+                                                <div class="mt-2">
+                                                    <small class="text-muted">Photo actuelle : {{ user.profile.photo.name|slice:"15:" }}</small>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ user_form.address.id_for_label }}" class="form-label">
+                                        <i class="fas fa-map-marker-alt"></i> Adresse
+                                    </label>
+                                    {{ user_form.address }}
+                                    {% if user_form.address.errors %}
+                                        <div class="text-danger">
+                                            {% for error in user_form.address.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ user_form.bio.id_for_label }}" class="form-label">
+                                        <i class="fas fa-user-edit"></i> Biographie
+                                    </label>
+                                    {{ user_form.bio }}
+                                    {% if user_form.bio.errors %}
+                                        <div class="text-danger">
+                                            {% for error in user_form.bio.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle"></i>
+                                        Présentez-vous brièvement. Cette information sera visible par les employeurs.
+                                    </div>
+                                </div>
+
+                                <hr>
+
+                                <h6 class="mb-3">
+                                    <i class="fas fa-link"></i> Liens professionnels
+                                </h6>
+
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="{{ user_form.linkedin_url.id_for_label }}" class="form-label">
+                                                <i class="fab fa-linkedin"></i> LinkedIn
+                                            </label>
+                                            {{ user_form.linkedin_url }}
+                                            {% if user_form.linkedin_url.errors %}
+                                                <div class="text-danger">
+                                                    {% for error in user_form.linkedin_url.errors %}
+                                                        <small>{{ error }}</small>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="{{ user_form.github_url.id_for_label }}" class="form-label">
+                                                <i class="fab fa-github"></i> GitHub
+                                            </label>
+                                            {{ user_form.github_url }}
+                                            {% if user_form.github_url.errors %}
+                                                <div class="text-danger">
+                                                    {% for error in user_form.github_url.errors %}
+                                                        <small>{{ error }}</small>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="{{ user_form.website_url.id_for_label }}" class="form-label">
+                                                <i class="fas fa-globe"></i> Site web
+                                            </label>
+                                            {{ user_form.website_url }}
+                                            {% if user_form.website_url.errors %}
+                                                <div class="text-danger">
+                                                    {% for error in user_form.website_url.errors %}
+                                                        <small>{{ error }}</small>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <a href="{% url 'accounts:profile_detail' %}" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left"></i> Annuler
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Enregistrer les modifications
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-info-circle"></i> Aperçu du profil
+                            </h5>
+                        </div>
+                        <div class="card-body text-center">
+                            {% if user.profile.photo %}
+                                <img src="{{ user.profile.photo.url }}" alt="Photo de profil" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 120px; height: 120px;">
+                                    <i class="fas fa-user fa-2x text-muted"></i>
+                                </div>
+                            {% endif %}
+                            <h6>{{ user.get_full_name|default:user.username }}</h6>
+                            <p class="text-muted small">{{ user.email }}</p>
+
+                            {% if user.profile.bio %}
+                                <div class="mt-3">
+                                    <small class="text-muted">
+                                        <strong>Bio :</strong><br>
+                                        {{ user.profile.bio|truncatewords:20 }}
+                                    </small>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-lightbulb"></i> Conseils
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled small">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success"></i>
+                                    Une photo professionnelle améliore votre profil
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success"></i>
+                                    Remplissez votre biographie pour vous démarquer
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success"></i>
+                                    Ajoutez vos liens professionnels
+                                </li>
+                                <li>
+                                    <i class="fas fa-check text-success"></i>
+                                    Gardez vos informations à jour
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
