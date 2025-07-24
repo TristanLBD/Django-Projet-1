@@ -234,56 +234,17 @@ class ApplicationAdmin(admin.ModelAdmin):
         ]
         return custom_urls + urls
 
+    def changelist_view(self, request, extra_context=None):
+        """Ajoute un bouton d'export CSV dans la vue de liste"""
+        extra_context = extra_context or {}
+        extra_context['show_export_button'] = True
+        extra_context['export_url'] = reverse('admin:jobs_application_export_csv')
+        return super().changelist_view(request, extra_context)
+
     def export_csv(self, request):
-        """Vue pour exporter les candidatures en CSV"""
-        from django.http import HttpResponse
-        import csv
-        from datetime import datetime
+        """Vue pour exporter les candidatures en CSV via l'API"""
+        from django.http import HttpResponseRedirect
+        from django.urls import reverse
 
-        # Récupérer les candidatures filtrées
-        queryset = self.get_queryset(request)
-
-        # Créer la réponse CSV
-        response = HttpResponse(content_type='text/csv; charset=utf-8')
-        response['Content-Disposition'] = f'attachment; filename="candidatures_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"'
-
-        # Écrire l'en-tête BOM pour Excel
-        response.write('\ufeff')
-
-        # Créer le writer CSV
-        writer = csv.writer(response, delimiter=';')
-
-        # Écrire l'en-tête
-        writer.writerow([
-            'ID Candidature',
-            'Date de candidature',
-            'Statut',
-            'Nom du candidat',
-            'Email du candidat',
-            'Titre du poste',
-            'Entreprise',
-            'Type de contrat',
-            'Localisation',
-            'Date d\'examen',
-            'Examiné par',
-            'Notes'
-        ])
-
-        # Écrire les données
-        for application in queryset:
-            writer.writerow([
-                application.id,
-                application.applied_at.strftime('%d/%m/%Y %H:%M'),
-                application.get_status_display(),
-                application.candidate.get_full_name() or application.candidate.username,
-                application.candidate.email,
-                application.job.title,
-                application.job.company.name,
-                application.job.get_contract_type_display(),
-                application.job.location,
-                application.reviewed_at.strftime('%d/%m/%Y %H:%M') if application.reviewed_at else '',
-                application.reviewed_by.get_full_name() if application.reviewed_by else '',
-                application.notes or ''
-            ])
-
-        return response
+        # Rediriger vers l'API d'export CSV
+        return HttpResponseRedirect(reverse('api:export_applications_today'))

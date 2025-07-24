@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from django.urls import reverse
+from django.urls import reverse, path
+from django.http import HttpResponseRedirect
 from .models import CSVExport, CSVImport
 
 
@@ -71,6 +72,29 @@ class CSVExportAdmin(admin.ModelAdmin):
     def has_change_permission(self, request, obj=None):
         """Empêche la modification des exports"""
         return False
+
+    def get_urls(self):
+        """Ajoute les URLs personnalisées pour l'export CSV"""
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                'export-csv/',
+                self.admin_site.admin_view(self.export_csv),
+                name='api_csvexport_export_csv',
+            ),
+        ]
+        return custom_urls + urls
+
+    def changelist_view(self, request, extra_context=None):
+        """Ajoute un bouton d'export CSV dans la vue de liste"""
+        extra_context = extra_context or {}
+        extra_context['show_export_button'] = True
+        extra_context['export_url'] = reverse('admin:api_csvexport_export_csv')
+        return super().changelist_view(request, extra_context)
+
+    def export_csv(self, request):
+        """Vue pour exporter les candidatures en CSV via l'API"""
+        return HttpResponseRedirect(reverse('api:export_applications_today'))
 
 
 @admin.register(CSVImport)
@@ -145,3 +169,26 @@ class CSVImportAdmin(admin.ModelAdmin):
     def has_change_permission(self, request, obj=None):
         """Empêche la modification des imports"""
         return False
+
+    def get_urls(self):
+        """Ajoute les URLs personnalisées pour l'import CSV"""
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                'import-csv/',
+                self.admin_site.admin_view(self.import_csv),
+                name='api_csvimport_import_csv',
+            ),
+        ]
+        return custom_urls + urls
+
+    def changelist_view(self, request, extra_context=None):
+        """Ajoute un bouton d'import CSV dans la vue de liste"""
+        extra_context = extra_context or {}
+        extra_context['show_import_button'] = True
+        extra_context['import_url'] = reverse('admin:api_csvimport_import_csv')
+        return super().changelist_view(request, extra_context)
+
+    def import_csv(self, request):
+        """Vue pour importer les candidatures en CSV via l'API"""
+        return HttpResponseRedirect(reverse('api:import_applications'))
