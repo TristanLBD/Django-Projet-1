@@ -15,7 +15,9 @@
                 <i class="fas fa-info-circle"></i>
                 <strong>Entreprises gérées :</strong>
                 {% for company in user_companies %}
-                    <span class="badge bg-primary me-2">{{ company.name }}</span>
+                    <a href="{% url 'companies:company_edit' company.pk %}" class="badge bg-primary me-2 text-decoration-none">
+                        {{ company.name }}
+                    </a>
                 {% endfor %}
             </div>
             {% endif %}

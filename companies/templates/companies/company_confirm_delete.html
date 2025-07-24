@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Supprimer l'entreprise - France chômage{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-exclamation-triangle"></i> Confirmer la suppression
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <h5><i class="fas fa-warning"></i> Attention !</h5>
+                        <p class="mb-0">
+                            Vous êtes sur le point de supprimer définitivement l'entreprise
+                            <strong>"{{ company.name }}"</strong>. Cette action est irréversible.
+                        </p>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">Détails de l'entreprise</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Nom :</strong> {{ company.name }}</p>
+                                    <p><strong>Email :</strong> {{ company.email }}</p>
+                                    <p><strong>Téléphone :</strong> {{ company.phone }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Adresse :</strong> {{ company.address }}</p>
+                                    <p><strong>Site web :</strong>
+                                        {% if company.website %}
+                                            <a href="{{ company.website }}" target="_blank">{{ company.website }}</a>
+                                        {% else %}
+                                            Non renseigné
+                                        {% endif %}
+                                    </p>
+                                    <p><strong>Statut :</strong>
+                                        {% if company.is_active %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Inactive</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-danger">
+                        <h6><i class="fas fa-info-circle"></i> Conséquences de la suppression :</h6>
+                        <ul class="mb-0">
+                            <li>Toutes les offres d'emploi associées seront également supprimées</li>
+                            <li>Toutes les candidatures liées à ces offres seront perdues</li>
+                            <li>Cette action ne peut pas être annulée</li>
+                        </ul>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'companies:company_edit' company.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Confirmer la suppression
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.card-header {
+    border-radius: 0.5rem 0.5rem 0 0 !important;
+}
+
+.alert {
+    border-radius: 0.375rem;
+}
+
+.btn {
+    border-radius: 0.375rem;
+    font-weight: 500;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+</style>
+{% endblock %}

@@ -150,10 +150,16 @@ def company_edit(request, pk):
 
 
 @login_required
-@user_passes_test(is_superuser)
 def company_delete(request, pk):
     """Vue pour supprimer une entreprise"""
+    from companies.utils import is_admin, can_manage_company
+
     company = get_object_or_404(Company, pk=pk)
+
+    # Vérifier les permissions
+    if not is_admin(request.user) and not can_manage_company(request.user, company):
+        messages.error(request, 'Vous n\'avez pas les permissions pour supprimer cette entreprise.')
+        return redirect('companies:company_manage')
 
     if request.method == 'POST':
         company.delete()

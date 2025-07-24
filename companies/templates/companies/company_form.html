@@ -166,10 +166,17 @@
                             <a href="{% url 'companies:company_manage' %}" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Annuler
                             </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i>
-                                {% if company %}Modifier{% else %}Créer{% endif %} l'entreprise
-                            </button>
+                            <div>
+                                {% if company %}
+                                    <a href="{% url 'companies:company_delete' company.pk %}" class="btn btn-danger me-2">
+                                        <i class="fas fa-trash"></i> Supprimer
+                                    </a>
+                                {% endif %}
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    {% if company %}Modifier{% else %}Créer{% endif %} l'entreprise
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
