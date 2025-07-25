@@ -3,7 +3,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
-from django.views.generic import CreateView, UpdateView, DetailView
+from django.views.generic import CreateView, UpdateView, DetailView, TemplateView
+from django.views import View
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import UserProfile
@@ -11,11 +12,9 @@ from .forms import UserProfileForm
 from companies.utils import is_employer, is_admin
 
 
-class LoginView:
+class LoginView(View):
     """Vue pour la page de connexion"""
-
-    def __init__(self):
-        self.template_name = 'accounts/login.html'
+    template_name = 'accounts/login.html'
 
     def get_success_url(self, user):
         """Détermine l'URL de redirection selon le type d'utilisateur"""
@@ -29,7 +28,6 @@ class LoginView:
     def get(self, request):
         if request.user.is_authenticated:
             return redirect(self.get_success_url(request.user))
-
         form = AuthenticationForm()
         return render(request, self.template_name, {'form': form})
 
@@ -47,53 +45,46 @@ class LoginView:
                 messages.error(request, 'Nom d\'utilisateur ou mot de passe incorrect.')
         else:
             messages.error(request, 'Veuillez corriger les erreurs ci-dessous.')
-
         return render(request, self.template_name, {'form': form})
 
 
-def login_view(request):
-    """Vue fonction pour la page de connexion"""
-    view = LoginView()
-    if request.method == 'GET':
-        return view.get(request)
-    elif request.method == 'POST':
-        return view.post(request)
-
-
-def logout_view(request):
+class LogoutView(View):
     """Vue pour la déconnexion"""
-    logout(request)
-    messages.success(request, 'Vous avez été déconnecté avec succès.')
-    return redirect('accounts:login')
-
-
-def profile_detail(request):
-    """Vue pour afficher le profil utilisateur"""
-    if not request.user.is_authenticated:
+    def get(self, request):
+        logout(request)
+        messages.success(request, 'Vous avez été déconnecté avec succès.')
         return redirect('accounts:login')
 
-    return render(request, 'accounts/profile_detail.html', {
-        'user': request.user
-    })
+
+class ProfileDetailView(LoginRequiredMixin, TemplateView):
+    """Vue pour afficher le profil utilisateur"""
+    template_name = 'accounts/profile_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user'] = self.request.user
+        return context
 
 
-@login_required
-def profile_edit(request):
+class ProfileEditView(LoginRequiredMixin, UpdateView):
     """Vue pour modifier le profil utilisateur"""
-    if request.method == 'POST':
-        # Formulaire pour les informations utilisateur
-        user_form = UserProfileForm(request.POST, request.FILES, instance=request.user.profile)
+    model = UserProfile
+    form_class = UserProfileForm
+    template_name = 'accounts/profile_edit.html'
+    success_url = reverse_lazy('accounts:profile_detail')
 
-        if user_form.is_valid():
-            user_form.save()
-            messages.success(request, 'Profil mis à jour avec succès !')
-            return redirect('accounts:profile_detail')
-        else:
-            messages.error(request, 'Veuillez corriger les erreurs ci-dessous.')
-    else:
-        user_form = UserProfileForm(instance=request.user.profile)
+    def get_object(self):
+        return self.request.user.profile
 
-    return render(request, 'accounts/profile_edit.html', {
-        'user_form': user_form,
-        'user': request.user
-    })
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user'] = self.request.user
+        return context
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Profil mis à jour avec succès !')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Veuillez corriger les erreurs ci-dessous.')
+        return super().form_invalid(form)

@@ -1,109 +1,118 @@
 import csv
 import io
-from datetime import datetime, timezone
+from datetime import datetime
 from django.http import HttpResponse
 from django.utils import timezone as django_timezone
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
+from django.views import View
 from jobs.models import Application, Job
 from companies.models import Company
-from accounts.models import UserProfile, User
+from accounts.models import User
 from .models import CSVExport, CSVImport
 
 
-@api_view(['GET'])
-def export_applications_csv(request):
-    try:
-        # Récupérer la date d'aujourd'hui
-        today = django_timezone.now().date()
+class ExportApplicationsCSVView(View):
+    """Vue pour exporter les candidatures du jour en CSV"""
 
-        # Filtrer les candidatures du jour
-        applications = Application.objects.filter(
-            applied_at__date=today
-        ).select_related(
-            'candidate',
-            'job',
-            'job__company'
-        )
+    def get(self, request):
+        try:
+            # Récupérer la date d'aujourd'hui
+            today = django_timezone.now().date()
 
-        # Créer le fichier CSV en mémoire
-        response = HttpResponse(content_type='text/csv; charset=utf-8')
-        response['Content-Disposition'] = f'attachment; filename="candidatures_{today.strftime("%Y%m%d")}.csv"'
+            # Filtrer les candidatures du jour
+            applications = Application.objects.filter(
+                applied_at__date=today
+            ).select_related(
+                'candidate',
+                'job',
+                'job__company'
+            )
 
-        # Écrire l'en-tête BOM pour Excel
-        response.write('\ufeff')
+            # Créer le fichier CSV en mémoire
+            response = HttpResponse(content_type='text/csv; charset=utf-8')
+            response['Content-Disposition'] = f'attachment; filename="candidatures_{today.strftime("%Y%m%d")}.csv"'
 
-        # Créer le writer CSV
-        writer = csv.writer(response, delimiter=';')
+            # Écrire l'en-tête BOM pour Excel
+            response.write('\ufeff')
 
-        # Écrire l'en-tête
-        writer.writerow([
-            'ID Candidature',
-            'Date de candidature',
-            'Statut',
-            'Nom du candidat',
-            'Email du candidat',
-            'Titre du poste',
-            'Entreprise',
-            'Type de contrat',
-            'Localisation',
-            'Date d\'examen',
-            'Examiné par',
-            'Notes'
-        ])
+            # Créer le writer CSV
+            writer = csv.writer(response, delimiter=';')
 
-        # Écrire les données
-        for application in applications:
+            # Écrire l'en-tête
             writer.writerow([
-                application.id,
-                application.applied_at.strftime('%d/%m/%Y %H:%M'),
-                application.get_status_display(),
-                application.candidate.get_full_name() or application.candidate.username,
-                application.candidate.email,
-                application.job.title,
-                application.job.company.name,
-                application.job.get_contract_type_display(),
-                application.job.location,
-                application.reviewed_at.strftime('%d/%m/%Y %H:%M') if application.reviewed_at else '',
-                application.reviewed_by.get_full_name() if application.reviewed_by else '',
-                application.notes or ''
+                'ID Candidature',
+                'Date de candidature',
+                'Statut',
+                'Nom du candidat',
+                'Email du candidat',
+                'Titre du poste',
+                'Entreprise',
+                'Type de contrat',
+                'Localisation',
+                'Date d\'examen',
+                'Examiné par',
+                'Notes'
             ])
 
-        # Enregistrer l'export dans la base de données
-        csv_export = CSVExport.objects.create(
-            export_type='APPLICATIONS',
-            file_path=f"exports/candidatures_{today.strftime('%Y%m%d')}.csv",
-            file_size=len(response.content),
-            record_count=applications.count(),
-            exported_by=request.user,
-            filters_applied={
-                'date': today.isoformat(),
-                'export_type': 'daily_applications'
-            }
-        )
+            # Écrire les données
+            for application in applications:
+                writer.writerow([
+                    application.id,
+                    application.applied_at.strftime('%d/%m/%Y %H:%M'),
+                    application.get_status_display(),
+                    application.candidate.get_full_name() or application.candidate.username,
+                    application.candidate.email,
+                    application.job.title,
+                    application.job.company.name,
+                    application.job.get_contract_type_display(),
+                    application.job.location,
+                    application.reviewed_at.strftime('%d/%m/%Y %H:%M') if application.reviewed_at else '',
+                    application.reviewed_by.get_full_name() if application.reviewed_by else '',
+                    application.notes or ''
+                ])
 
-        return response
+            # Enregistrer l'export dans la base de données
+            csv_export = CSVExport.objects.create(
+                export_type='APPLICATIONS',
+                file_path=f"exports/candidatures_{today.strftime('%Y%m%d')}.csv",
+                file_size=len(response.content),
+                record_count=applications.count(),
+                exported_by=request.user,
+                filters_applied={
+                    'date': today.isoformat(),
+                    'export_type': 'daily_applications'
+                }
+            )
 
-    except Exception as e:
-        return Response(
-            {'error': f'Erreur lors de l\'export: {str(e)}'},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+            return response
+
+        except Exception as e:
+            return Response(
+                {'error': f'Erreur lors de l\'export: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
-
-
-
-@login_required
-def import_applications_csv(request):
+class ImportApplicationsCSVView(LoginRequiredMixin, View):
     """Vue pour importer des candidatures depuis un fichier CSV"""
-    if request.method == 'POST' and request.FILES.get('csv_file'):
+    template_name = 'admin/api/csvimport/import_form.html'
+
+    def get(self, request):
+        """Afficher le formulaire d'import"""
+        return render(request, self.template_name, {
+            'title': 'Importer des candidatures depuis un fichier CSV',
+            'opts': {'app_label': 'api', 'model_name': 'csvimport'},
+        })
+
+    def post(self, request):
+        """Traiter l'import du fichier CSV"""
+        if not request.FILES.get('csv_file'):
+            messages.error(request, 'Aucun fichier sélectionné.')
+            return redirect('admin:api_csvimport_changelist')
+
         csv_file = request.FILES['csv_file']
 
         # Vérifier l'extension du fichier
@@ -219,13 +228,3 @@ def import_applications_csv(request):
         except Exception as e:
             messages.error(request, f'Erreur lors de l\'import: {str(e)}')
             return redirect('admin:api_csvimport_changelist')
-
-    # Si c'est une requête GET, afficher le formulaire d'import
-    from django.shortcuts import render
-    return render(request, 'admin/api/csvimport/import_form.html', {
-        'title': 'Importer des candidatures depuis un fichier CSV',
-        'opts': {'app_label': 'api', 'model_name': 'csvimport'},
-    })
-
-
-

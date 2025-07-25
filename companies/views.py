@@ -1,171 +1,150 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
 from django.http import HttpResponse
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
+from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView, TemplateView
+from django.views import View
 from .models import Company, CompanyPhoto
 from .forms import CompanyForm, CompanyPhotoForm
 from jobs.models import Job
+from .utils import is_admin, get_user_companies, can_manage_company
 
 
-def is_superuser(user):
-    """Vérifie si l'utilisateur est un superuser"""
-    return user.is_superuser
-
-
-def company_detail(request, pk):
+class CompanyDetailView(DetailView):
     """Vue pour afficher le détail d'une entreprise"""
-    company = get_object_or_404(Company, pk=pk, is_active=True)
+    model = Company
+    template_name = 'companies/company_detail.html'
+    context_object_name = 'company'
 
-    # Récupérer les offres d'emploi actives de cette entreprise
-    jobs = Job.objects.filter(
-        company=company,
-        is_active=True,
-        is_filled=False
-    ).order_by('-created_at')
+    def get_queryset(self):
+        return Company.objects.filter(is_active=True)
 
-    return render(request, 'companies/company_detail.html', {
-        'company': company,
-        'jobs': jobs
-    })
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Récupérer les offres d'emploi actives de cette entreprise
+        context['jobs'] = Job.objects.filter(
+            company=self.object,
+            is_active=True,
+            is_filled=False
+        ).order_by('-created_at')
+        return context
 
 
-@login_required
-def company_manage(request):
+class CompanyManageView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     """Vue pour gérer les entreprises (employeurs)"""
-    from companies.utils import is_admin, get_user_companies
-    from jobs.models import Application
+    model = Company
+    template_name = 'companies/company_manage.html'
+    context_object_name = 'companies'
 
-    # Vérifier les permissions
-    if not is_admin(request.user):
-        messages.error(request, 'Accès non autorisé.')
-        return redirect('employer_dashboard')
+    def test_func(self):
+        return is_admin(self.request.user)
 
-    # Récupérer les entreprises selon les permissions
-    if is_admin(request.user):
-        companies = Company.objects.all()
-    else:
-        companies = get_user_companies(request.user)
+    def get_queryset(self):
+        queryset = Company.objects.all()
 
         # Appliquer les filtres
-    status = request.GET.get('status')
-    company_name = request.GET.get('company_name')
-    location = request.GET.get('location')
+        status = self.request.GET.get('status')
+        company_name = self.request.GET.get('company_name')
+        location = self.request.GET.get('location')
 
-    if status == 'active':
-        companies = companies.filter(is_active=True)
-    elif status == 'inactive':
-        companies = companies.filter(is_active=False)
+        if status == 'active':
+            queryset = queryset.filter(is_active=True)
+        elif status == 'inactive':
+            queryset = queryset.filter(is_active=False)
 
-    if company_name:
-        companies = companies.filter(name__icontains=company_name)
+        if company_name:
+            queryset = queryset.filter(name__icontains=company_name)
 
-    if location:
-        companies = companies.filter(address__icontains=location)
+        if location:
+            queryset = queryset.filter(address__icontains=location)
 
-    # Trier par date de création
-    companies = companies.order_by('-created_at')
+        # Trier par date de création
+        queryset = queryset.order_by('-created_at')
 
-    # Calculer les statistiques
-    total_companies = companies.count()
-    active_companies = companies.filter(is_active=True).count()
+        # Ajouter le nombre total de candidatures par entreprise
+        from jobs.models import Application
+        for company in queryset:
+            company.total_applications = Application.objects.filter(job__company=company).count()
 
-    # Compter les offres d'emploi
-    total_jobs = Job.objects.filter(company__in=companies).count()
+        return queryset
 
-    # Compter les candidatures
-    total_applications = Application.objects.filter(job__company__in=companies).count()
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        companies = context['companies']
 
-    # Récupérer les secteurs uniques pour les filtres (basé sur le nom pour l'instant)
-    sectors = Company.objects.values_list('name', flat=True).distinct().order_by('name')[:10]
+        # Calculer les statistiques
+        context['total_companies'] = companies.count()
+        context['active_companies'] = companies.filter(is_active=True).count()
+        context['total_jobs'] = Job.objects.filter(company__in=companies).count()
 
-    # Ajouter le nombre total de candidatures par entreprise
-    for company in companies:
-        company.total_applications = Application.objects.filter(job__company=company).count()
+        from jobs.models import Application
+        context['total_applications'] = Application.objects.filter(job__company__in=companies).count()
 
-    return render(request, 'companies/company_manage.html', {
-        'companies': companies,
-        'total_companies': total_companies,
-        'active_companies': active_companies,
-        'total_jobs': total_jobs,
-        'total_applications': total_applications,
-        'sectors': sectors,
-    })
+        # Récupérer les secteurs uniques pour les filtres
+        context['sectors'] = Company.objects.values_list('name', flat=True).distinct().order_by('name')[:10]
+
+        return context
 
 
-@login_required
-def company_create(request):
+class CompanyCreateView(LoginRequiredMixin, CreateView):
     """Vue pour créer une nouvelle entreprise"""
-    from companies.utils import is_admin
+    model = Company
+    form_class = CompanyForm
+    template_name = 'companies/company_form.html'
+    success_url = reverse_lazy('companies:company_manage')
 
-    if request.method == 'POST':
-        form = CompanyForm(request.POST, request.FILES)
-        if form.is_valid():
-            company = form.save(commit=False)
-            company.created_by = request.user
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Créer une entreprise'
+        return context
 
-            # Si l'utilisateur n'est pas admin, l'assigner comme employeur responsable
-            if not is_admin(request.user):
-                company.employer = request.user
+    def form_valid(self, form):
+        company = form.save(commit=False)
+        company.created_by = self.request.user
 
-            company.save()
+        # Si l'utilisateur n'est pas admin, l'assigner comme employeur responsable
+        if not is_admin(self.request.user):
+            company.employer = self.request.user
 
-            messages.success(request, 'Entreprise créée avec succès !')
-            return redirect('companies:company_manage')
-    else:
-        form = CompanyForm()
-
-    return render(request, 'companies/company_form.html', {
-        'form': form,
-        'title': 'Créer une entreprise'
-    })
+        company.save()
+        messages.success(self.request, 'Entreprise créée avec succès !')
+        return super().form_valid(form)
 
 
-@login_required
-def company_edit(request, pk):
+class CompanyEditView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """Vue pour modifier une entreprise"""
-    from companies.utils import is_admin, can_manage_company
+    model = Company
+    form_class = CompanyForm
+    template_name = 'companies/company_form.html'
+    success_url = reverse_lazy('companies:company_manage')
 
-    company = get_object_or_404(Company, pk=pk)
+    def test_func(self):
+        company = self.get_object()
+        return is_admin(self.request.user) or can_manage_company(self.request.user, company)
 
-    # Vérifier les permissions
-    if not is_admin(request.user) and not can_manage_company(request.user, company):
-        messages.error(request, 'Vous n\'avez pas les permissions pour modifier cette entreprise.')
-        return redirect('companies:company_manage')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Modifier l\'entreprise'
+        context['company'] = self.object
+        return context
 
-    if request.method == 'POST':
-        form = CompanyForm(request.POST, request.FILES, instance=company)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Entreprise modifiée avec succès !')
-            return redirect('companies:company_manage')
-    else:
-        form = CompanyForm(instance=company)
-
-    return render(request, 'companies/company_form.html', {
-        'form': form,
-        'company': company,
-        'title': 'Modifier l\'entreprise'
-    })
+    def form_valid(self, form):
+        messages.success(self.request, 'Entreprise modifiée avec succès !')
+        return super().form_valid(form)
 
 
-@login_required
-def company_delete(request, pk):
+class CompanyDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """Vue pour supprimer une entreprise"""
-    from companies.utils import is_admin, can_manage_company
+    model = Company
+    template_name = 'companies/company_confirm_delete.html'
+    success_url = reverse_lazy('companies:company_manage')
 
-    company = get_object_or_404(Company, pk=pk)
+    def test_func(self):
+        company = self.get_object()
+        return is_admin(self.request.user) or can_manage_company(self.request.user, company)
 
-    # Vérifier les permissions
-    if not is_admin(request.user) and not can_manage_company(request.user, company):
-        messages.error(request, 'Vous n\'avez pas les permissions pour supprimer cette entreprise.')
-        return redirect('companies:company_manage')
-
-    if request.method == 'POST':
-        company.delete()
+    def delete(self, request, *args, **kwargs):
         messages.success(request, 'Entreprise supprimée avec succès !')
-        return redirect('companies:company_manage')
-
-    return render(request, 'companies/company_confirm_delete.html', {
-        'company': company
-    })
+        return super().delete(request, *args, **kwargs)

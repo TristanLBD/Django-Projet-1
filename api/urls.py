@@ -5,8 +5,8 @@ app_name = 'api'
 
 urlpatterns = [
     # Export CSV des candidatures du jour
-    path('export/applications/today/', views.export_applications_csv, name='export_applications_today'),
+    path('export/applications/today/', views.ExportApplicationsCSVView.as_view(), name='export_applications_today'),
 
     # Import CSV des candidatures
-    path('import/applications/', views.import_applications_csv, name='import_applications'),
+    path('import/applications/', views.ImportApplicationsCSVView.as_view(), name='import_applications'),
 ]
