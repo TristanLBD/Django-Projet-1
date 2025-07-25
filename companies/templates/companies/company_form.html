@@ -138,6 +138,31 @@
                                 {% endif %}
                             </div>
 
+                            <!-- Logo de l'entreprise -->
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.logo.id_for_label }}" class="form-label">
+                                    <i class="fas fa-image"></i> Logo de l'entreprise
+                                </label>
+                                {% if company and company.logo %}
+                                    <div class="mb-2">
+                                        <img src="{{ company.logo.url }}" alt="Logo actuel"
+                                             class="img-thumbnail" style="max-height: 100px; max-width: 150px;">
+                                        <p class="text-muted small">Logo actuel</p>
+                                    </div>
+                                {% endif %}
+                                {{ form.logo }}
+                                {% if form.logo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.logo.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if form.logo.help_text %}
+                                    <div class="form-text">{{ form.logo.help_text }}</div>
+                                {% endif %}
+                            </div>
+
                             <!-- Statut -->
                             <div class="col-md-12 mb-3">
                                 <div class="card">

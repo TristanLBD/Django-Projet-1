@@ -10,6 +10,13 @@ class Company(models.Model):
     phone = models.CharField(max_length=20, verbose_name="Téléphone")
     email = models.EmailField(verbose_name="Email")
     website = models.URLField(blank=True, null=True, verbose_name="Site web")
+    logo = models.ImageField(
+        upload_to='companies/logos/',
+        blank=True,
+        null=True,
+        verbose_name="Logo de l'entreprise",
+        help_text="Logo officiel de l'entreprise (format: JPG, PNG, GIF, WebP, max 2MB)"
+    )
     created_by = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

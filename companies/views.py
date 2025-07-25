@@ -99,7 +99,7 @@ def company_create(request):
     from companies.utils import is_admin
 
     if request.method == 'POST':
-        form = CompanyForm(request.POST)
+        form = CompanyForm(request.POST, request.FILES)
         if form.is_valid():
             company = form.save(commit=False)
             company.created_by = request.user
@@ -134,7 +134,7 @@ def company_edit(request, pk):
         return redirect('companies:company_manage')
 
     if request.method == 'POST':
-        form = CompanyForm(request.POST, instance=company)
+        form = CompanyForm(request.POST, request.FILES, instance=company)
         if form.is_valid():
             form.save()
             messages.success(request, 'Entreprise modifiée avec succès !')
