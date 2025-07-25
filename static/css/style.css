@@ -1,0 +1,501 @@
+/* ===== VARIABLES CSS ===== */
+:root {
+    /* Couleurs principales */
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --accent-color: #e74c3c;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --info-color: #17a2b8;
+
+    /* Couleurs de fond */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-dark: #2c3e50;
+    --bg-light: #ecf0f1;
+
+    /* Couleurs de texte */
+    --text-primary: #2c3e50;
+    --text-secondary: #7f8c8d;
+    --text-light: #ffffff;
+    --text-muted: #95a5a6;
+
+    /* Ombres */
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+    --shadow-md: 0 4px 8px rgba(0,0,0,0.15);
+    --shadow-lg: 0 8px 16px rgba(0,0,0,0.2);
+
+    /* Bordures */
+    --border-radius: 8px;
+    --border-color: #e9ecef;
+
+    /* Transitions */
+    --transition: all 0.3s ease;
+}
+
+/* ===== RESET ET BASE ===== */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-primary);
+    background-color: var(--bg-secondary);
+    line-height: 1.6;
+}
+
+/* ===== NAVBAR PERSONNALISÉE ===== */
+.navbar {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+    box-shadow: var(--shadow-md);
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    font-size: 2rem !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 2px !important;
+    color: var(--text-light) !important;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3) !important;
+    transition: var(--transition) !important;
+}
+
+.navbar-brand:hover {
+    color: var(--accent-color) !important;
+    transform: scale(1.05) !important;
+}
+
+.navbar-nav .nav-link {
+    color: var(--text-light) !important;
+    font-weight: 500 !important;
+    margin: 0 0.5rem !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: var(--border-radius) !important;
+    transition: var(--transition) !important;
+}
+
+.navbar-nav .nav-link:hover {
+    background-color: rgba(255,255,255,0.1) !important;
+    color: var(--accent-color) !important;
+    transform: translateY(-2px) !important;
+}
+
+.navbar-toggler {
+    border: none !important;
+    color: var(--text-light) !important;
+}
+
+/* ===== BOUTONS PERSONNALISÉS ===== */
+.btn-primary {
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color)) !important;
+    border: none !important;
+    border-radius: var(--border-radius) !important;
+    padding: 0.75rem 1.5rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: var(--shadow-sm) !important;
+    transition: var(--transition) !important;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-md) !important;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--success-color), #2ecc71) !important;
+    border: none !important;
+    border-radius: var(--border-radius) !important;
+    padding: 0.75rem 1.5rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: var(--shadow-sm) !important;
+    transition: var(--transition) !important;
+}
+
+.btn-success:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--accent-color), #c0392b) !important;
+    border: none !important;
+    border-radius: var(--border-radius) !important;
+    padding: 0.75rem 1.5rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: var(--shadow-sm) !important;
+    transition: var(--transition) !important;
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+.btn-outline-primary {
+    border: 2px solid var(--secondary-color) !important;
+    color: var(--secondary-color) !important;
+    border-radius: var(--border-radius) !important;
+    padding: 0.75rem 1.5rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    transition: var(--transition) !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--secondary-color) !important;
+    color: var(--text-light) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+/* ===== CARTES PERSONNALISÉES ===== */
+.card {
+    border: none !important;
+    border-radius: var(--border-radius) !important;
+    box-shadow: var(--shadow-sm) !important;
+    transition: var(--transition) !important;
+    background: var(--bg-primary) !important;
+    overflow: hidden !important;
+}
+
+.card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: var(--shadow-lg) !important;
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+    color: var(--text-light) !important;
+    border: none !important;
+    padding: 1.5rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+}
+
+.card-body {
+    padding: 2rem !important;
+}
+
+.card-title {
+    color: var(--primary-color) !important;
+    font-weight: 700 !important;
+    margin-bottom: 1rem !important;
+}
+
+.card-text {
+    color: var(--text-secondary) !important;
+    line-height: 1.8 !important;
+}
+
+/* ===== CARTES AVEC COULEURS DE FOND ===== */
+.card.bg-primary {
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color)) !important;
+    color: var(--text-light) !important;
+}
+
+.card.bg-primary .card-title,
+.card.bg-primary .card-text {
+    color: var(--text-light) !important;
+}
+
+.card.bg-success {
+    background: linear-gradient(135deg, var(--success-color), #2ecc71) !important;
+    color: var(--text-light) !important;
+}
+
+.card.bg-success .card-title,
+.card.bg-success .card-text {
+    color: var(--text-light) !important;
+}
+
+.card.bg-warning {
+    background: linear-gradient(135deg, var(--warning-color), #e67e22) !important;
+    color: var(--text-light) !important;
+}
+
+.card.bg-warning .card-title,
+.card.bg-warning .card-text {
+    color: var(--text-light) !important;
+}
+
+.card.bg-info {
+    background: linear-gradient(135deg, var(--info-color), #3498db) !important;
+    color: var(--text-light) !important;
+}
+
+.card.bg-info .card-title,
+.card.bg-info .card-text {
+    color: var(--text-light) !important;
+}
+
+.card.bg-danger {
+    background: linear-gradient(135deg, var(--accent-color), #c0392b) !important;
+    color: var(--text-light) !important;
+}
+
+.card.bg-danger .card-title,
+.card.bg-danger .card-text {
+    color: var(--text-light) !important;
+}
+
+/* ===== FORMULAIRES PERSONNALISÉS ===== */
+.form-control {
+    border: 2px solid var(--border-color) !important;
+    border-radius: var(--border-radius) !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 1rem !important;
+    transition: var(--transition) !important;
+    background-color: var(--bg-primary) !important;
+}
+
+.form-control:focus {
+    border-color: var(--secondary-color) !important;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25) !important;
+    outline: none !important;
+}
+
+.form-label {
+    font-weight: 600 !important;
+    color: var(--primary-color) !important;
+    margin-bottom: 0.5rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    font-size: 0.9rem !important;
+}
+
+/* ===== ALERTES PERSONNALISÉES ===== */
+.alert {
+    border: none !important;
+    border-radius: var(--border-radius) !important;
+    padding: 1rem 1.5rem !important;
+    font-weight: 500 !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb) !important;
+    color: #155724 !important;
+    border-left: 4px solid var(--success-color) !important;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #f8d7da, #f5c6cb) !important;
+    color: #721c24 !important;
+    border-left: 4px solid var(--accent-color) !important;
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7) !important;
+    color: #856404 !important;
+    border-left: 4px solid var(--warning-color) !important;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, #d1ecf1, #bee5eb) !important;
+    color: #0c5460 !important;
+    border-left: 4px solid var(--info-color) !important;
+}
+
+/* ===== TABLEAUX PERSONNALISÉS ===== */
+.table {
+    background: var(--bg-primary) !important;
+    border-radius: var(--border-radius) !important;
+    overflow: hidden !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.table thead th {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+    color: var(--text-light) !important;
+    border: none !important;
+    padding: 1rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+.table tbody tr {
+    transition: var(--transition) !important;
+}
+
+.table tbody tr:hover {
+    background-color: var(--bg-light) !important;
+    transform: scale(1.01) !important;
+}
+
+.table td {
+    padding: 1rem !important;
+    border-color: var(--border-color) !important;
+    vertical-align: middle !important;
+}
+
+/* ===== BADGES PERSONNALISÉS ===== */
+.badge {
+    padding: 0.5rem 1rem !important;
+    border-radius: 20px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    font-size: 0.8rem !important;
+}
+
+.badge-primary {
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color)) !important;
+    color: var(--text-light) !important;
+}
+
+.badge-success {
+    background: linear-gradient(135deg, var(--success-color), #2ecc71) !important;
+    color: var(--text-light) !important;
+}
+
+.badge-danger {
+    background: linear-gradient(135deg, var(--accent-color), #c0392b) !important;
+    color: var(--text-light) !important;
+}
+
+.badge-warning {
+    background: linear-gradient(135deg, var(--warning-color), #e67e22) !important;
+    color: var(--text-light) !important;
+}
+
+/* ===== PAGINATION PERSONNALISÉE ===== */
+.pagination .page-link {
+    border: none !important;
+    color: var(--primary-color) !important;
+    padding: 0.75rem 1rem !important;
+    margin: 0 0.25rem !important;
+    border-radius: var(--border-radius) !important;
+    transition: var(--transition) !important;
+}
+
+.pagination .page-link:hover {
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color)) !important;
+    color: var(--text-light) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+    color: var(--text-light) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+/* ===== FOOTER PERSONNALISÉ ===== */
+footer {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+    color: var(--text-light) !important;
+    padding: 3rem 0 2rem 0 !important;
+    margin-top: auto !important;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.1) !important;
+}
+
+footer h5 {
+    color: var(--accent-color) !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    margin-bottom: 1.5rem !important;
+}
+
+footer p, footer a {
+    color: var(--text-light) !important;
+    text-decoration: none !important;
+    transition: var(--transition) !important;
+}
+
+footer a:hover {
+    color: var(--accent-color) !important;
+    transform: translateX(5px) !important;
+}
+
+footer .brand-text {
+    font-size: 1.5rem !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 2px !important;
+    color: var(--accent-color) !important;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3) !important;
+}
+
+/* ===== UTILITAIRES ===== */
+.text-gradient {
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color)) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+}
+
+.bg-gradient-success {
+    background: linear-gradient(135deg, var(--success-color), #2ecc71) !important;
+}
+
+.bg-gradient-danger {
+    background: linear-gradient(135deg, var(--accent-color), #c0392b) !important;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.5rem !important;
+    }
+
+    .card-body {
+        padding: 1.5rem !important;
+    }
+
+    .btn {
+        padding: 0.5rem 1rem !important;
+        font-size: 0.9rem !important;
+    }
+}
+
+/* ===== SCROLLBAR PERSONNALISÉE ===== */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-light);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}

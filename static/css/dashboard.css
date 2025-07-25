@@ -1,0 +1,328 @@
+/* ===== DASHBOARD STYLES ===== */
+
+/* Sidebar personnalisée */
+.dashboard-sidebar {
+    background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+    min-height: 100vh;
+    padding: 2rem 0;
+    box-shadow: var(--shadow-md);
+}
+
+.dashboard-sidebar .nav-link {
+    color: var(--text-light) !important;
+    padding: 1rem 1.5rem !important;
+    margin: 0.5rem 1rem !important;
+    border-radius: var(--border-radius) !important;
+    transition: var(--transition) !important;
+    font-weight: 500 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    font-size: 0.9rem !important;
+}
+
+.dashboard-sidebar .nav-link:hover,
+.dashboard-sidebar .nav-link.active {
+    background: rgba(255,255,255,0.1) !important;
+    color: var(--accent-color) !important;
+    transform: translateX(10px) !important;
+}
+
+.dashboard-sidebar .nav-link i {
+    margin-right: 0.75rem !important;
+    width: 20px !important;
+    text-align: center !important;
+}
+
+/* Header du dashboard */
+.dashboard-header {
+    background: var(--bg-primary) !important;
+    padding: 1.5rem 0 !important;
+    box-shadow: var(--shadow-sm) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+.dashboard-title {
+    color: var(--primary-color) !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    margin: 0 !important;
+}
+
+.dashboard-subtitle {
+    color: var(--text-secondary) !important;
+    font-size: 1.1rem !important;
+    margin: 0.5rem 0 0 0 !important;
+}
+
+/* Cartes de statistiques */
+.stats-card {
+    background: linear-gradient(135deg, var(--bg-primary), var(--bg-light)) !important;
+    border: none !important;
+    border-radius: var(--border-radius) !important;
+    box-shadow: var(--shadow-sm) !important;
+    transition: var(--transition) !important;
+    overflow: hidden !important;
+    position: relative !important;
+}
+
+.stats-card::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 4px !important;
+    background: linear-gradient(90deg, var(--secondary-color), var(--primary-color)) !important;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: var(--shadow-lg) !important;
+}
+
+.stats-card .card-body {
+    padding: 2rem !important;
+    text-align: center !important;
+}
+
+.stats-card .stats-icon {
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 auto 1.5rem auto !important;
+    font-size: 1.5rem !important;
+    color: white !important;
+}
+
+.stats-card .stats-icon.primary {
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color)) !important;
+}
+
+.stats-card .stats-icon.success {
+    background: linear-gradient(135deg, var(--success-color), #2ecc71) !important;
+}
+
+.stats-card .stats-icon.warning {
+    background: linear-gradient(135deg, var(--warning-color), #e67e22) !important;
+}
+
+.stats-card .stats-icon.danger {
+    background: linear-gradient(135deg, var(--accent-color), #c0392b) !important;
+}
+
+.stats-card .stats-number {
+    font-size: 2.5rem !important;
+    font-weight: 700 !important;
+    color: var(--primary-color) !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.stats-card .stats-label {
+    color: var(--text-secondary) !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    font-size: 0.9rem !important;
+}
+
+/* Tableaux de données */
+.data-table {
+    background: var(--bg-primary) !important;
+    border-radius: var(--border-radius) !important;
+    overflow: hidden !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.data-table .table {
+    margin: 0 !important;
+}
+
+.data-table .table thead th {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+    color: var(--text-light) !important;
+    border: none !important;
+    padding: 1.25rem 1rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    font-size: 0.9rem !important;
+}
+
+.data-table .table tbody tr {
+    transition: var(--transition) !important;
+}
+
+.data-table .table tbody tr:hover {
+    background-color: var(--bg-light) !important;
+}
+
+.data-table .table td {
+    padding: 1rem !important;
+    border-color: var(--border-color) !important;
+    vertical-align: middle !important;
+}
+
+/* Actions rapides */
+.quick-actions {
+    background: var(--bg-primary) !important;
+    border-radius: var(--border-radius) !important;
+    padding: 2rem !important;
+    box-shadow: var(--shadow-sm) !important;
+    margin-bottom: 2rem !important;
+}
+
+.quick-actions h5 {
+    color: var(--primary-color) !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    margin-bottom: 1.5rem !important;
+}
+
+.quick-action-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 1rem 1.5rem !important;
+    margin: 0.5rem !important;
+    border-radius: var(--border-radius) !important;
+    text-decoration: none !important;
+    color: var(--text-light) !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    transition: var(--transition) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.quick-action-btn:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: var(--shadow-md) !important;
+    color: var(--text-light) !important;
+}
+
+.quick-action-btn.primary {
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color)) !important;
+}
+
+.quick-action-btn.success {
+    background: linear-gradient(135deg, var(--success-color), #2ecc71) !important;
+}
+
+.quick-action-btn.warning {
+    background: linear-gradient(135deg, var(--warning-color), #e67e22) !important;
+}
+
+.quick-action-btn i {
+    margin-right: 0.75rem !important;
+    font-size: 1.2rem !important;
+}
+
+/* Graphiques et visualisations */
+.chart-container {
+    background: var(--bg-primary) !important;
+    border-radius: var(--border-radius) !important;
+    padding: 2rem !important;
+    box-shadow: var(--shadow-sm) !important;
+    margin-bottom: 2rem !important;
+}
+
+.chart-container h5 {
+    color: var(--primary-color) !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    margin-bottom: 1.5rem !important;
+}
+
+/* Notifications */
+.notification-item {
+    background: var(--bg-primary) !important;
+    border: none !important;
+    border-radius: var(--border-radius) !important;
+    margin-bottom: 1rem !important;
+    box-shadow: var(--shadow-sm) !important;
+    transition: var(--transition) !important;
+}
+
+.notification-item:hover {
+    transform: translateX(5px) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+.notification-item .card-body {
+    padding: 1.5rem !important;
+}
+
+.notification-item.unread {
+    border-left: 4px solid var(--secondary-color) !important;
+}
+
+.notification-item.unread::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 1rem !important;
+    right: 1rem !important;
+    width: 8px !important;
+    height: 8px !important;
+    background: var(--accent-color) !important;
+    border-radius: 50% !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard-sidebar {
+        min-height: auto !important;
+        padding: 1rem 0 !important;
+    }
+
+    .stats-card .card-body {
+        padding: 1.5rem !important;
+    }
+
+    .stats-card .stats-number {
+        font-size: 2rem !important;
+    }
+
+    .quick-action-btn {
+        padding: 0.75rem 1rem !important;
+        margin: 0.25rem !important;
+        font-size: 0.9rem !important;
+    }
+}
+
+/* Animations spécifiques au dashboard */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.dashboard-content {
+    animation: slideInRight 0.6s ease-out;
+}
+
+/* États de chargement */
+.loading-skeleton {
+    background: linear-gradient(90deg, var(--bg-light) 25%, var(--bg-secondary) 50%, var(--bg-light) 75%) !important;
+    background-size: 200% 100% !important;
+    animation: loading 1.5s infinite !important;
+    border-radius: var(--border-radius) !important;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}

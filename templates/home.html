@@ -38,29 +38,29 @@
     <div class="container py-5">
         <div class="row text-center">
             <div class="col-md-4 mb-4">
-                <div class="card border-0 shadow-sm h-100">
+                <div class="card stats-card h-100">
                     <div class="card-body">
-                        <i class="fas fa-building fa-3x text-primary mb-3"></i>
+                        <i class="fas fa-building fa-3x mb-3"></i>
                         <h4 class="card-title">Entreprises partenaires</h4>
-                        <p class="card-text text-muted">Des entreprises de tous secteurs vous font confiance</p>
+                        <p class="card-text">Des entreprises de tous secteurs vous font confiance</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-4 mb-4">
-                <div class="card border-0 shadow-sm h-100">
+                <div class="card stats-card h-100">
                     <div class="card-body">
-                        <i class="fas fa-briefcase fa-3x text-success mb-3"></i>
+                        <i class="fas fa-briefcase fa-3x mb-3"></i>
                         <h4 class="card-title">Offres d'emploi</h4>
-                        <p class="card-text text-muted">Des milliers d'opportunités dans toute la France</p>
+                        <p class="card-text">Des milliers d'opportunités dans toute la France</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-4 mb-4">
-                <div class="card border-0 shadow-sm h-100">
+                <div class="card stats-card h-100">
                     <div class="card-body">
-                        <i class="fas fa-users fa-3x text-info mb-3"></i>
+                        <i class="fas fa-users fa-3x mb-3"></i>
                         <h4 class="card-title">Candidats satisfaits</h4>
-                        <p class="card-text text-muted">Rejoignez notre communauté de chercheurs d'emploi</p>
+                        <p class="card-text">Rejoignez notre communauté de chercheurs d'emploi</p>
                     </div>
                 </div>
             </div>
@@ -80,14 +80,14 @@
         <div class="row">
             {% for job in recent_jobs %}
             <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card h-100 shadow-sm">
+                <div class="card job-card h-100">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-3">
                             {% if job.company.logo %}
                                 <img src="{{ job.company.logo.url }}" alt="{{ job.company.name }}"
-                                     class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                     class="company-logo rounded me-3" style="width: 50px; height: 50px; object-fit: cover;">
                             {% else %}
-                                <div class="bg-secondary rounded me-3 d-flex align-items-center justify-content-center"
+                                <div class="company-placeholder bg-secondary rounded me-3 d-flex align-items-center justify-content-center"
                                      style="width: 50px; height: 50px;">
                                     <i class="fas fa-building text-white"></i>
                                 </div>
@@ -101,10 +101,10 @@
                         <h5 class="card-title">{{ job.title }}</h5>
 
                         <div class="mb-3">
-                            <span class="badge bg-primary me-1">{{ job.get_contract_type_display }}</span>
-                            <span class="badge bg-secondary me-1">{{ job.get_experience_level_display }}</span>
+                            <span class="badge badge-primary me-1">{{ job.get_contract_type_display }}</span>
+                            <span class="badge badge-warning me-1">{{ job.get_experience_level_display }}</span>
                             {% if job.is_remote %}
-                            <span class="badge bg-success">Télétravail</span>
+                            <span class="badge badge-success">Télétravail</span>
                             {% endif %}
                         </div>
 
@@ -139,7 +139,7 @@
     {% endif %}
 
     <!-- Section employeurs -->
-    <div class="bg-light py-5">
+    <div class="employer-section bg-light py-5">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6">
@@ -172,32 +172,5 @@
     </div>
 </div>
 
-<style>
-.hero-section {
-    background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
-    min-height: 400px;
-    display: flex;
-    align-items: center;
-}
 
-.card {
-    transition: transform 0.2s ease-in-out;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-}
-
-.badge {
-    font-size: 0.8rem;
-}
-
-.fa-8x {
-    font-size: 8rem;
-}
-
-.fa-6x {
-    font-size: 6rem;
-}
-</style>
 {% endblock %}
