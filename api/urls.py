@@ -4,9 +4,7 @@ from . import views
 app_name = 'api'
 
 urlpatterns = [
-    # Export CSV des candidatures du jour
-    path('export/applications/today/', views.ExportApplicationsCSVView.as_view(), name='export_applications_today'),
-
-    # Import CSV des candidatures
+    path('export/applications/today/', views.ExportApplicationsTodayCSVView.as_view(), name='export_applications_today'),
+    path('export/applications/all/', views.ExportAllApplicationsCSVView.as_view(), name='export_applications_all'),
     path('import/applications/', views.ImportApplicationsCSVView.as_view(), name='import_applications'),
 ]

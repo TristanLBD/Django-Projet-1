@@ -2,25 +2,22 @@ import csv
 import io
 from datetime import datetime
 from django.http import HttpResponse
-from django.utils import timezone as django_timezone
+from django.utils import timezone
+from django.views import View
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.views import View
 from jobs.models import Application, Job
 from companies.models import Company
-from accounts.models import User
-from .models import CSVExport, CSVImport
 
 
-class ExportApplicationsCSVView(View):
-    """Vue pour exporter les candidatures du jour en CSV"""
+class ExportApplicationsTodayCSVView(View):
+    """Vue API pour exporter les candidatures du jour en CSV"""
 
     def get(self, request):
         try:
             # Récupérer la date d'aujourd'hui
-            today = django_timezone.now().date()
+            today = timezone.now().date()
 
             # Filtrer les candidatures du jour
             applications = Application.objects.filter(
@@ -28,7 +25,8 @@ class ExportApplicationsCSVView(View):
             ).select_related(
                 'candidate',
                 'job',
-                'job__company'
+                'job__company',
+                'reviewed_by'
             )
 
             # Créer le fichier CSV en mémoire
@@ -74,51 +72,104 @@ class ExportApplicationsCSVView(View):
                     application.notes or ''
                 ])
 
-            # Enregistrer l'export dans la base de données
-            csv_export = CSVExport.objects.create(
-                export_type='APPLICATIONS',
-                file_path=f"exports/candidatures_{today.strftime('%Y%m%d')}.csv",
-                file_size=len(response.content),
-                record_count=applications.count(),
-                exported_by=request.user,
-                filters_applied={
-                    'date': today.isoformat(),
-                    'export_type': 'daily_applications'
-                }
+            return response
+
+        except Exception as e:
+            return HttpResponse(
+                f'Erreur lors de l\'export: {str(e)}',
+                status=500,
+                content_type='text/plain'
             )
+
+
+class ExportAllApplicationsCSVView(View):
+    """Vue API pour exporter toutes les candidatures en CSV"""
+
+    def get(self, request):
+        try:
+            # Récupérer toutes les candidatures
+            applications = Application.objects.all().select_related(
+                'candidate',
+                'job',
+                'job__company',
+                'reviewed_by'
+            )
+
+            # Créer le fichier CSV en mémoire
+            response = HttpResponse(content_type='text/csv; charset=utf-8')
+            response['Content-Disposition'] = f'attachment; filename="candidatures_{datetime.now().strftime("%Y%m%d_%H%M")}.csv"'
+
+            # Écrire l'en-tête BOM pour Excel
+            response.write('\ufeff')
+
+            # Créer le writer CSV
+            writer = csv.writer(response, delimiter=';')
+
+            # Écrire l'en-tête
+            writer.writerow([
+                'ID Candidature',
+                'Date de candidature',
+                'Statut',
+                'Nom du candidat',
+                'Email du candidat',
+                'Titre du poste',
+                'Entreprise',
+                'Type de contrat',
+                'Localisation',
+                'Date d\'examen',
+                'Examiné par',
+                'Notes'
+            ])
+
+            # Écrire les données
+            for application in applications:
+                writer.writerow([
+                    application.id,
+                    application.applied_at.strftime('%d/%m/%Y %H:%M'),
+                    application.get_status_display(),
+                    application.candidate.get_full_name() or application.candidate.username,
+                    application.candidate.email,
+                    application.job.title,
+                    application.job.company.name,
+                    application.job.get_contract_type_display(),
+                    application.job.location,
+                    application.reviewed_at.strftime('%d/%m/%Y %H:%M') if application.reviewed_at else '',
+                    application.reviewed_by.get_full_name() if application.reviewed_by else '',
+                    application.notes or ''
+                ])
 
             return response
 
         except Exception as e:
-            return Response(
-                {'error': f'Erreur lors de l\'export: {str(e)}'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            return HttpResponse(
+                f'Erreur lors de l\'export: {str(e)}',
+                status=500,
+                content_type='text/plain'
             )
 
 
-class ImportApplicationsCSVView(LoginRequiredMixin, View):
-    """Vue pour importer des candidatures depuis un fichier CSV"""
-    template_name = 'admin/api/csvimport/import_form.html'
+class ImportApplicationsCSVView(View):
+    """Vue API pour importer des candidatures depuis un fichier CSV"""
 
     def get(self, request):
         """Afficher le formulaire d'import"""
-        return render(request, self.template_name, {
+        return render(request, 'admin/jobs/application/import_form.html', {
             'title': 'Importer des candidatures depuis un fichier CSV',
-            'opts': {'app_label': 'api', 'model_name': 'csvimport'},
+            'opts': {'app_label': 'jobs', 'model_name': 'application'},
         })
 
     def post(self, request):
         """Traiter l'import du fichier CSV"""
         if not request.FILES.get('csv_file'):
             messages.error(request, 'Aucun fichier sélectionné.')
-            return redirect('admin:api_csvimport_changelist')
+            return redirect('admin:jobs_application_changelist')
 
         csv_file = request.FILES['csv_file']
 
         # Vérifier l'extension du fichier
         if not csv_file.name.endswith('.csv'):
             messages.error(request, 'Le fichier doit être au format CSV.')
-            return redirect('admin:api_csvimport_changelist')
+            return redirect('admin:jobs_application_changelist')
 
         try:
             # Lire le fichier CSV
@@ -202,19 +253,6 @@ class ImportApplicationsCSVView(LoginRequiredMixin, View):
                     error_log.append(f"Ligne {records_processed + 1}: {str(e)}")
                     continue
 
-            # Enregistrer l'import dans la base de données
-            CSVImport.objects.create(
-                import_type='APPLICATIONS',
-                file_path=csv_file.name,
-                file_size=csv_file.size,
-                records_processed=records_processed,
-                records_created=records_created,
-                records_updated=records_updated,
-                records_failed=records_failed,
-                imported_by=request.user,
-                error_log='\n'.join(error_log) if error_log else ''
-            )
-
             # Afficher les messages de succès/erreur
             if records_created > 0:
                 messages.success(request, f'{records_created} candidature(s) créée(s) avec succès.')
@@ -223,8 +261,8 @@ class ImportApplicationsCSVView(LoginRequiredMixin, View):
             if records_failed > 0:
                 messages.warning(request, f'{records_failed} candidature(s) n\'ont pas pu être importées.')
 
-            return redirect('admin:api_csvimport_changelist')
+            return redirect('admin:jobs_application_changelist')
 
         except Exception as e:
             messages.error(request, f'Erreur lors de l\'import: {str(e)}')
-            return redirect('admin:api_csvimport_changelist')
+            return redirect('admin:jobs_application_changelist')

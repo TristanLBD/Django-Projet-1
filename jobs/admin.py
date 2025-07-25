@@ -1,9 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from django.urls import reverse, path
-from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.contrib import messages
-from django.shortcuts import redirect
 from django.utils import timezone
 from .models import Job, Application
 
@@ -20,6 +18,9 @@ class ApplicationInline(admin.TabularInline):
 
     def has_add_permission(self, request, obj=None):
         return False
+
+
+
 
 
 @admin.register(Job)
@@ -222,29 +223,10 @@ class ApplicationAdmin(admin.ModelAdmin):
             return qs
         return qs.filter(job__created_by=request.user)
 
-    def get_urls(self):
-        """Ajoute les URLs personnalisées pour l'export CSV"""
-        urls = super().get_urls()
-        custom_urls = [
-            path(
-                'export-csv/',
-                self.admin_site.admin_view(self.export_csv),
-                name='jobs_application_export_csv',
-            ),
-        ]
-        return custom_urls + urls
-
     def changelist_view(self, request, extra_context=None):
-        """Ajoute un bouton d'export CSV dans la vue de liste"""
+        """Ajoute des boutons d'import/export CSV dans la vue de liste"""
         extra_context = extra_context or {}
-        extra_context['show_export_button'] = True
-        extra_context['export_url'] = reverse('admin:jobs_application_export_csv')
+        extra_context['show_import_export_buttons'] = True
+        extra_context['export_url'] = '/api/export/applications/all/'
+        extra_context['import_url'] = '/api/import/applications/'
         return super().changelist_view(request, extra_context)
-
-    def export_csv(self, request):
-        """Vue pour exporter les candidatures en CSV via l'API"""
-        from django.http import HttpResponseRedirect
-        from django.urls import reverse
-
-        # Rediriger vers l'API d'export CSV
-        return HttpResponseRedirect(reverse('api:export_applications_today'))

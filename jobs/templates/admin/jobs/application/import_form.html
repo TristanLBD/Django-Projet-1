@@ -1,0 +1,109 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrahead %}{{ block.super }}
+<script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+{{ form.media }}
+{% endblock %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">
+<style>
+    .import-form {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+    .import-form h1 {
+        color: #333;
+        margin-bottom: 20px;
+    }
+    .form-row {
+        margin-bottom: 15px;
+    }
+    .form-row label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .form-row input[type="file"] {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+    }
+    .submit-row {
+        margin-top: 20px;
+        text-align: right;
+    }
+    .submit-row input {
+        background: #79aec8;
+        color: #fff;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    .submit-row input:hover {
+        background: #417690;
+    }
+    .help-text {
+        background: #f9f9f9;
+        padding: 15px;
+        border-left: 4px solid #79aec8;
+        margin: 15px 0;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; <a href="{% url 'admin:jobs_application_changelist' %}">Candidatures</a>
+    &rsaquo; Import CSV
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <div class="import-form">
+        <h1>Importer des candidatures depuis un fichier CSV</h1>
+
+        <div class="help-text">
+            <h3>Format attendu du fichier CSV :</h3>
+            <p>Le fichier doit contenir les colonnes suivantes (séparées par des points-virgules) :</p>
+            <ul>
+                <li><strong>ID Candidature</strong> : Identifiant unique (optionnel pour nouveaux enregistrements)</li>
+                <li><strong>Date de candidature</strong> : Format DD/MM/YYYY HH:MM</li>
+                <li><strong>Statut</strong> : En attente, En cours d'examen, Acceptée, Refusée, Retirée</li>
+                <li><strong>Nom du candidat</strong> : Nom complet</li>
+                <li><strong>Email du candidat</strong> : Adresse email (obligatoire)</li>
+                <li><strong>Titre du poste</strong> : Titre de l'offre d'emploi</li>
+                <li><strong>Entreprise</strong> : Nom de l'entreprise</li>
+                <li><strong>Type de contrat</strong> : CDI, CDD, Stage, etc.</li>
+                <li><strong>Localisation</strong> : Lieu du poste</li>
+                <li><strong>Date d'examen</strong> : Format DD/MM/YYYY HH:MM (optionnel)</li>
+                <li><strong>Examiné par</strong> : Nom de l'examinateur (optionnel)</li>
+                <li><strong>Notes</strong> : Notes additionnelles (optionnel)</li>
+            </ul>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-row">
+                <label for="csv_file">Sélectionner le fichier CSV :</label>
+                <input type="file" name="csv_file" id="csv_file" accept=".csv" required>
+            </div>
+
+            <div class="submit-row">
+                <input type="submit" value="Importer les candidatures">
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
