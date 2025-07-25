@@ -10,6 +10,72 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
+    <style>
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #ffffff !important;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            color: #ffd700 !important;
+            transform: scale(1.05);
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+        }
+
+        .navbar-brand i {
+            margin-right: 10px;
+            color: #ffd700;
+            font-size: 2rem;
+        }
+
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Styles pour le footer */
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        footer {
+            background: linear-gradient(135deg, #007bff, #0056b3) !important;
+            color: white !important;
+            padding: 2rem 0 !important;
+            margin-top: auto !important;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+
+        footer .container {
+            text-align: center;
+        }
+
+        footer p {
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        footer .brand-text {
+            color: #ffd700;
+            font-weight: 700;
+            font-size: 1.4rem;
+        }
+    </style>
+
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -73,9 +139,9 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-light mt-5 py-4">
-        <div class="container text-center">
-            <p class="text-muted mb-0">&copy; 2024 France chômage. Tous droits réservés.</p>
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 <span class="brand-text">France chômage</span>.</p>
         </div>
     </footer>
 
