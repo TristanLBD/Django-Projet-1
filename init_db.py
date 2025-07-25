@@ -440,6 +440,9 @@ def init_database():
         print("   👔 finance_employer / finance123 (employeur)")
         print("   👔 creative_employer / creative123 (employeur)")
         print("\n🚀 Lancez le serveur avec: python manage.py runserver")
+        print("🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠")
+        print("Le compte admin devra peut etre etre creer manuellement")
+        print("🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠")
 
     except Exception as e:
         print(f"❌ Erreur lors de l'initialisation : {str(e)}")
