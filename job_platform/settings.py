@@ -82,12 +82,32 @@ WSGI_APPLICATION = 'job_platform.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Configuration de la base de données
+import os
+
+# Utiliser PostgreSQL si DATABASE_URL est définie, sinon SQLite
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    # Configuration PostgreSQL
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'france_chomage',
+            'USER': 'django',
+            'PASSWORD': 'django123',
+            'HOST': 'db',
+            'PORT': '5432',
+        }
     }
-}
+else:
+    # Configuration SQLite (développement local)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation

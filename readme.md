@@ -1,267 +1,260 @@
-# 🚀 France Chômage - Plateforme de Candidature
+# 🏢 France Chômage - Plateforme de Candidature
 
-Une plateforme moderne de gestion des candidatures d'emploi développée avec Django, permettant aux entreprises de publier des offres et aux candidats de postuler facilement.
-
-## 📋 Table des matières
-
-- [Fonctionnalités](#-fonctionnalités)
-- [Technologies utilisées](#-technologies-utilisées)
-- [Installation](#-installation)
-- [Configuration](#-configuration)
-- [Utilisation](#-utilisation)
-- [API](#-api)
-- [Structure du projet](#-structure-du-projet)
-- [Comptes de test](#-comptes-de-test)
+Une plateforme moderne de recherche d'emploi et de candidature développée avec Django, permettant aux candidats de postuler et aux employeurs de gérer leurs offres d'emploi.
 
 ## ✨ Fonctionnalités
 
-### 👥 Gestion des utilisateurs
-- **Candidats** : Création de profil, candidatures, suivi des postulations
-- **Employeurs** : Gestion d'entreprises, publication d'offres, suivi des candidatures
-- **Administrateurs** : Supervision complète, statistiques, gestion des utilisateurs
+### 👤 **Pour les Candidats**
+- 📝 Création de profil utilisateur
+- 🔍 Recherche et consultation d'offres d'emploi
+- 📄 Candidature en ligne avec lettre de motivation
+- 📊 Suivi des candidatures (en attente, acceptée, refusée)
+- 📧 Notifications par email
 
-### 💼 Gestion des offres d'emploi
-- Publication d'offres avec descriptions détaillées
-- Filtrage par localisation, type de contrat, niveau d'expérience
-- Support du télétravail
-- Système de candidatures avec lettres de motivation
+### 👔 **Pour les Employeurs**
+- 🏢 Gestion d'entreprise et profil
+- 💼 Publication d'offres d'emploi
+- 📋 Gestion des candidatures reçues
+- 📊 Tableau de bord employeur
+- 📧 Notifications automatiques
 
-### 🏢 Gestion des entreprises
-- Profils d'entreprises complets
-- Logos et photos d'entreprise
-- Informations de contact détaillées
+### 🔧 **Administration**
+- ⚙️ Interface d'administration Django complète
+- 📊 Statistiques et rapports
+- 📥 Import/Export CSV des candidatures
+- 🔐 Gestion des utilisateurs et permissions
 
-### 📊 Tableaux de bord
-- **Dashboard candidat** : Suivi des candidatures, offres recommandées
-- **Dashboard employeur** : Statistiques par entreprise, gestion des candidatures
-- **Dashboard admin** : Vue d'ensemble complète, statistiques globales
+## 🛠️ Technologies
 
-### 🔄 API et exports
-- Export CSV des candidatures (quotidien et complet)
-- Import CSV des candidatures
-- API REST pour l'intégration externe
-
-## 🛠 Technologies utilisées
-
-- **Backend** : Django 5.1, Python 3.11+
-- **Base de données** : SQLite (développement) / PostgreSQL (production)
-- **Frontend** : Bootstrap 5, HTML5, CSS3, JavaScript
-- **Authentification** : Django Auth System
+- **Backend** : Django 4.2+
+- **Base de données** : PostgreSQL (Docker) / SQLite (local)
+- **Frontend** : Bootstrap 5, HTML5, CSS3
 - **API** : Django REST Framework
-- **Emails** : Django Email Backend
-- **Interface admin** : Django Admin personnalisé
+- **Containerisation** : Docker & Docker Compose
+- **Email** : SMTP intégré
 
 ## 🚀 Installation
 
-### Prérequis
+### **Option 1 : Installation Locale**
 
-- Python 3.11 ou supérieur
-- pip (gestionnaire de paquets Python)
-- Git
+#### Prérequis
+- Python 3.11+
+- pip
 
-### Étapes d'installation
-
-1. **Cloner le repository**
+#### Étapes
 ```bash
+# 1. Cloner le projet
 git clone https://github.com/TristanLBD/Django-Projet-1.git
 cd "Projet Django 2"
-```
 
-2. **Créer un environnement virtuel**
-```bash
+# 2. Créer un environnement virtuel
 python -m venv venv
-# Windows
-venv\Scripts\activate
-# Linux/Mac
-source venv/bin/activate
-```
+venv\Scripts\activate  # Windows
+# source venv/bin/activate  # Linux/Mac
 
-3. **Installer les dépendances**
-```bash
+# 3. Installer les dépendances
 pip install -r requirements.txt
-```
 
-4. **Configurer la base de données**
-```bash
+# 4. Configurer la base de données
 python manage.py makemigrations
 python manage.py migrate
-```
 
-5. **Initialiser les données de test**
-```bash
+# 5. Initialiser avec des données de test
 python init_db.py
-```
 
-6. **Lancer le serveur**
-```bash
+# 6. Créer un superutilisateur (optionnel)
+python manage.py createsuperuser
+
+# 7. Lancer le serveur
 python manage.py runserver
 ```
 
+### **Option 2 : Installation avec Docker**
+
+#### Prérequis
+- Docker Desktop
+- Docker Compose
+
+#### Étapes
+```bash
+# 1. Cloner le projet
+git clone https://github.com/TristanLBD/Django-Projet-1.git
+cd "Projet Django 2"
+
+# 2. Lancer avec Docker Compose
+docker-compose up --build
+
+# 3. L'application sera accessible sur http://localhost:8000
+```
+
+## 📊 Comptes de Test
+
+### **Candidats**
+- **testuser** / **testpass123** - Candidat de test
+
+### **Employeurs**
+- **techcorp_employer** / **techcorp123** - TechCorp Solutions
+- **digital_employer** / **digital123** - Digital Marketing Pro
+- **green_employer** / **green123** - Green Energy Plus
+- **finance_employer** / **finance123** - Finance Consulting
+- **creative_employer** / **creative123** - Creative Design Studio
+
+### **Administration**
+ - **admin** / **admin123**
+- Ou créer manuellement : `python manage.py createsuperuser`
+
+## 🌐 Utilisation
+
+### **Accès à l'Application**
+- **Application** : http://localhost:8000
+- **Administration** : http://localhost:8000/admin
+
+### **Fonctionnalités Principales**
+
+#### **Candidats**
+1. Créer un compte ou se connecter
+2. Parcourir les offres d'emploi
+3. Postuler avec une lettre de motivation
+4. Suivre l'état des candidatures
+
+#### **Employeurs**
+1. Se connecter avec un compte employeur
+2. Gérer le profil de l'entreprise
+3. Publier des offres d'emploi
+4. Consulter et traiter les candidatures
+
+#### **Administrateurs**
+1. Accéder à l'interface d'administration
+2. Gérer les utilisateurs et entreprises
+3. Utiliser les fonctionnalités d'import/export CSV
+4. Consulter les statistiques
+
+## 📁 Structure du Projet
+
+```
+Projet Django 2/
+├── accounts/                 # Gestion des utilisateurs
+├── api/                     # API REST et import/export
+├── companies/               # Gestion des entreprises
+├── jobs/                    # Offres d'emploi et candidatures
+├── job_platform/           # Configuration principale Django
+├── templates/              # Templates HTML
+├── static/                 # Fichiers statiques
+├── media/                  # Fichiers uploadés
+├── docker-compose.yml      # Configuration Docker
+├── Dockerfile              # Image Docker
+├── requirements.txt        # Dépendances Python
+├── init_db.py             # Script d'initialisation
+└── readme.md              # Ce fichier
+```
+
+## 🔌 API
+
+### **Endpoints Disponibles**
+- `GET /api/export/applications/today/` - Export CSV des candidatures du jour
+- `GET /api/export/applications/all/` - Export CSV de toutes les candidatures
+- `POST /api/import/applications/` - Import CSV de candidatures
+
+### **Format CSV**
+Le fichier CSV doit contenir les colonnes suivantes :
+- `candidate_email`, `candidate_first_name`, `candidate_last_name`
+- `job_title`, `company_name`
+- `cover_letter`, `status`
+- `application_date`
+
 ## ⚙️ Configuration
 
-### Variables d'environnement
-
-Créez un fichier `.env` à la racine du projet :
+### **Variables d'Environnement (Optionnel)**
+Créer un fichier `.env` à la racine :
 
 ```env
-SECRET_KEY=votre-clé-secrète-django
+# Configuration Django
 DEBUG=True
+SECRET_KEY=your-secret-key-here
 ALLOWED_HOSTS=localhost,127.0.0.1
-DATABASE_URL=sqlite:///db.sqlite3
+
+# Configuration base de données (optionnel)
+DATABASE_URL=postgresql://django:django123@db:5432/france_chomage
 
 # Configuration email (optionnel)
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USE_TLS=True
-EMAIL_HOST_USER=votre-email@gmail.com
-EMAIL_HOST_PASSWORD=votre-mot-de-passe-app
+EMAIL_HOST_USER=your-email@gmail.com
+EMAIL_HOST_PASSWORD=your-app-password
 ```
 
-### Configuration de la base de données
+### **Base de Données**
+- **Développement local** : SQLite (automatique)
+- **Docker** : PostgreSQL (automatique)
+- **Production** : Configurable via `DATABASE_URL`
 
-Pour la production, modifiez `job_platform/settings.py` :
+## 🐳 Docker
 
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'nom_de_votre_db',
-        'USER': 'utilisateur_db',
-        'PASSWORD': 'mot_de_passe_db',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
+### **Services**
+- **web** : Application Django (port 8000)
+- **db** : Base de données PostgreSQL (port 5432)
+
+### **Commandes Utiles**
+```bash
+# Démarrer
+docker-compose up -d
+
+# Voir les logs
+docker-compose logs -f
+
+# Arrêter
+docker-compose down
+
+# Reconstruire
+docker-compose up --build
+
+# Accéder au shell Django
+docker-compose exec web python manage.py shell
+
+# Accéder à PostgreSQL
+docker-compose exec db psql -U django -d france_chomage
 ```
 
-## 📖 Utilisation
-
-### Accès aux interfaces
-
-- **Site principal** : http://127.0.0.1:8000/
-- **Administration** : http://127.0.0.1:8000/admin/
-- **API** : http://127.0.0.1:8000/api/
-
-### Workflow typique
-
-1. **Création d'un compte employeur**
-   - Inscription via l'interface web
-   - Création d'un profil d'entreprise
-
-2. **Publication d'une offre**
-   - Remplir le formulaire d'offre d'emploi
-   - Définir les critères (localisation, salaire, etc.)
-   - Publier l'offre
-
-3. **Candidature d'un utilisateur**
-   - Parcourir les offres disponibles
-   - Postuler avec une lettre de motivation
-   - Suivre le statut de la candidature
-
-4. **Gestion par l'employeur**
-   - Recevoir les notifications de candidatures
-   - Examiner les profils des candidats
-   - Mettre à jour le statut des candidatures
-
-## 🔌 API
-
-### Endpoints disponibles
-
-| Endpoint | Méthode | Description |
-|----------|---------|-------------|
-| `/api/export/applications/today/` | GET | Export CSV des candidatures du jour |
-| `/api/export/applications/all/` | GET | Export CSV de toutes les candidatures |
-| `/api/import/applications/` | POST | Import CSV de candidatures |
-
-### Format CSV pour l'import
-
-```csv
-candidate_email;candidate_first_name;candidate_last_name;job_title;company_name;cover_letter;status
-john.doe@email.com;John;Doe;Développeur Python;TechCorp Solutions;Lettre de motivation...;PENDING
-```
-
-### Exemple d'utilisation
+## 🧪 Tests
 
 ```bash
-# Export des candidatures du jour
-curl http://127.0.0.1:8000/api/export/applications/today/
+# Tests locaux
+python manage.py test
 
-# Import de candidatures
-curl -X POST -F "csv_file=@candidatures.csv" http://127.0.0.1:8000/api/import/applications/
+# Tests dans Docker
+docker-compose exec web python manage.py test
 ```
 
-## 📁 Structure du projet
+## 📈 Déploiement
 
-```
-Projet Django 2/
-├── accounts/                 # Gestion des utilisateurs
-├── api/                     # API REST et exports
-├── companies/               # Gestion des entreprises
-├── jobs/                    # Gestion des offres et candidatures
-├── job_platform/           # Configuration principale
-├── templates/              # Templates HTML
-├── static/                 # Fichiers statiques
-├── media/                  # Fichiers uploadés
-├── init_db.py             # Script d'initialisation
-├── requirements.txt        # Dépendances Python
-└── readme.md              # Documentation
-```
-
-## 👥 Comptes de test
-
-Après avoir lancé `python init_db.py`, les comptes suivants sont créés :
-
-### Candidat
-- **Utilisateur** : `testuser`
-- **Mot de passe** : `testpass123`
-
-### Employeurs
-- **TechCorp** : `techcorp_employer` / `techcorp123`
-- **Digital Marketing** : `digital_employer` / `digital123`
-- **Green Energy** : `green_employer` / `green123`
-- **Finance Consulting** : `finance_employer` / `finance123`
-- **Creative Design** : `creative_employer` / `creative123`
-
-### Administrateur
-- **Utilisateur** : `admin`
-- **Mot de passe** : `admin123`
-- *À créer manuellement avec `python manage.py createsuperuser`*
-
-## 🚀 Déploiement
-
-### Préparation pour la production
-
-1. **Sécurité**
+### **Production avec Docker**
 ```bash
-# Générer une nouvelle clé secrète
-python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+# 1. Configurer les variables d'environnement
+cp .env.example .env
+# Éditer .env avec les valeurs de production
+
+# 2. Déployer
+docker-compose -f docker-compose.prod.yml up -d
 ```
 
-2. **Variables d'environnement**
-```env
-DEBUG=False
-SECRET_KEY=votre-nouvelle-cle-secrete
-ALLOWED_HOSTS=votre-domaine.com
-```
-
-3. **Base de données**
+### **Production Classique**
 ```bash
+# 1. Installer les dépendances
+pip install -r requirements.txt
+
+# 2. Configurer la base de données de production
+# 3. Collecter les fichiers statiques
 python manage.py collectstatic
-python manage.py migrate
+
+# 4. Utiliser un serveur WSGI (Gunicorn, uWSGI)
 ```
-
-### Plateformes recommandées
-
-- **Heroku** : Déploiement simple avec PostgreSQL
-- **DigitalOcean** : VPS avec contrôle total
-- **AWS** : Services cloud scalables
-- **PythonAnywhere** : Hébergement spécialisé Python
 
 ## 🤝 Contribution
 
 1. Fork le projet
 2. Créer une branche feature (`git checkout -b feature/AmazingFeature`)
-3. Commit les changements (`git commit -m 'Add some AmazingFeature'`)
+3. Commit les changements (`git commit -m 'Add AmazingFeature'`)
 4. Push vers la branche (`git push origin feature/AmazingFeature`)
 5. Ouvrir une Pull Request
 
@@ -269,12 +262,42 @@ python manage.py migrate
 
 Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
-## 📞 Support
+## 🆘 Support
 
-Pour toute question ou problème :
-- Ouvrir une issue sur GitHub
-- Contacter l'équipe de développement
+### **Problèmes Courants**
+
+#### **Erreur de connexion à la base de données**
+- Vérifier que Docker Desktop est démarré
+- Relancer `docker-compose up --build`
+
+#### **Erreur de migrations**
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+#### **Problème de permissions**
+```bash
+# Windows
+icacls . /grant Everyone:F /T
+
+# Linux/Mac
+chmod -R 755 .
+```
+
+### **Contact**
+- **Issues** : [GitHub Issues](url-du-repo/issues)
+- **Email** : support@france-chomage.fr
+
+## 🎯 Roadmap
+
+- [ ] Interface mobile responsive
+- [ ] Système de notifications push
+- [ ] Intégration LinkedIn
+- [ ] Système de recommandations
+- [ ] Analytics avancées
+- [ ] API publique complète
 
 ---
 
-**Développé avec ❤️ pour simplifier le processus de recrutement**
+**Développé avec ❤️ pour simplifier la recherche d'emploi en France**
