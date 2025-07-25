@@ -30,7 +30,29 @@ def init_database():
         CompanyPhoto.objects.all().delete()
         Company.objects.all().delete()
         UserProfile.objects.all().delete()
-        User.objects.filter(is_superuser=False).delete()
+        User.objects.filter(is_superuser=False, username__in=['testuser', 'techcorp_employer', 'digital_employer', 'green_employer', 'finance_employer', 'creative_employer']).delete()
+
+        # Créer le compte administrateur
+        print("👑 Création du compte administrateur...")
+        admin_user, created = User.objects.get_or_create(
+            username='admin',
+            defaults={
+                'email': 'admin@france-chomage.fr',
+                'first_name': 'Admin',
+                'last_name': 'France Chômage',
+                'is_staff': True,
+                'is_superuser': True
+            }
+        )
+        if created:
+            admin_user.set_password('admin123')
+            admin_user.save()
+            print("✅ Compte administrateur créé")
+        else:
+            # Mettre à jour le mot de passe si l'admin existe déjà
+            admin_user.set_password('admin123')
+            admin_user.save()
+            print("✅ Mot de passe administrateur mis à jour")
 
         # Créer un utilisateur de test
         print("👤 Création de l'utilisateur de test...")
@@ -410,13 +432,13 @@ def init_database():
 
         print("\n🎉 Initialisation terminée avec succès !")
         print("\n📋 Comptes créés :")
+        print("   👑 admin / admin123 (administrateur)")
         print("   👤 testuser / testpass123 (candidat)")
         print("   👔 techcorp_employer / techcorp123 (employeur)")
         print("   👔 digital_employer / digital123 (employeur)")
         print("   👔 green_employer / green123 (employeur)")
         print("   👔 finance_employer / finance123 (employeur)")
         print("   👔 creative_employer / creative123 (employeur)")
-        print("   👑 admin / admin123 (administrateur - à créer manuellement)")
         print("\n🚀 Lancez le serveur avec: python manage.py runserver")
 
     except Exception as e:
